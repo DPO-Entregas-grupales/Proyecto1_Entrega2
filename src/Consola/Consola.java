@@ -12,9 +12,15 @@ import Usuarios.Empleado;
 import Usuarios.Administrador;
 import Tienda.ArticuloTienda;
 import Tienda.ProductoCafeteria;
+import Persistencia.CentralPersistencia;
+import Persistencia.PersistenciaClubDeportivoJson;
+import Persistencia.PersistenciaTiendaJson;
 
 public class Consola {
-
+	
+	private static final String RUTA_CLUB = "./datos/ClubDeportivo.json";
+	private static final String RUTA_TIENDA = "./datos/Tienda.json";
+	private static final String RUTA_USUARIOS = "./datos/Usuarios.json";
     private final ClubDeportivoSeneca club;
     private final Tienda tienda;
     private final Autentificador autentificador;
@@ -40,6 +46,13 @@ public class Consola {
     }
 
     public void iniciar() {
+    	club.cargarUsuarios(RUTA_USUARIOS);
+    	club.cargarClubDeportivo(RUTA_CLUB);
+    	tienda.cargarTienda(RUTA_TIENDA);
+    	contadorUsuarios = obtenerMaxId(club.getUsuarios().keySet())+1;
+        contadorReservas = obtenerMaxId(club.getReservas().keySet())+1;
+        contadorPartidos = obtenerMaxId(club.getPartidos().keySet())+1;
+    	
         System.out.println("==========================================");
         System.out.println("  BIENVENIDO AL CLUB DEPORTIVO SÉNECA");
         System.out.println("==========================================");
@@ -47,7 +60,7 @@ public class Consola {
         boolean salirApp = false;
         while (!salirApp) {
             if (usuarioAutenticado == null) {
-                salirApp = menuAutenticacion();
+            	salirApp = menuAutenticacion();
             } else {
                 menuPrincipal();
             }
@@ -83,12 +96,17 @@ public class Consola {
             }
             case 2 -> registrarUsuarioInicial();
             case 0 -> {
+            	club.salvarUsuarios(RUTA_USUARIOS);
+                club.salvarClubDeportivo(RUTA_CLUB);
+                tienda.salvarTienda(RUTA_TIENDA);
                 return true;
             }
             default -> System.out.println("Opción inválida.");
         }
         return false;
     }
+    
+    
 
     private void registrarUsuarioInicial() {
         System.out.println("\n--- REGISTRO DE USUARIO ---");
@@ -182,7 +200,7 @@ public class Consola {
         System.out.println("3. Instalaciones y Reservas");
         System.out.println("4. Tienda y Cafetería");
         System.out.println("5. Partidos y Entrenamientos");
-        System.out.println("6. Persistencia (Guardar / Cargar)");
+        System.out.println("6. Guardar");
         System.out.println("9. Cerrar Sesión");
         System.out.println("0. Salir de la aplicación");
 
@@ -195,7 +213,12 @@ public class Consola {
             case 5 -> menuPartidosYEntrenamientos();
             case 6 -> menuPersistencia();
             case 9 -> cerrarSesion();
-            case 0 -> System.exit(0);
+            case 0 -> {
+            	club.salvarUsuarios(RUTA_USUARIOS);
+                club.salvarClubDeportivo(RUTA_CLUB);
+                tienda.salvarTienda(RUTA_TIENDA);
+            	System.out.println("Aplicación finalizada. ¡Hasta luego!");
+            	System.exit(0);}
             default -> System.out.println("Opción no válida.");
         }
     }
@@ -423,37 +446,13 @@ public class Consola {
     }
 
     private void menuPersistencia() {
-        System.out.println("\n--- PERSISTENCIA ---");
-        System.out.println("1. Cargar Datos del Club");
-        System.out.println("2. Salvar Datos del Club");
-        System.out.println("3. Cargar Usuarios");
-        System.out.println("4. Salvar Usuarios");
-        System.out.println("0. Volver");
-
-        int op = leerEntero("Opción: ");
-        switch (op) {
-            case 1 -> {
-                String archivo = leerTexto("Archivo a cargar: ");
-                club.cargarClubDeportivo(archivo);
-                System.out.println("Carga de datos ejecutada.");
-            }
-            case 2 -> {
-                String archivo = leerTexto("Archivo destino: ");
-                club.salvarClubDeportivo(archivo);
-                System.out.println("Guardado de datos ejecutado.");
-            }
-            case 3 -> {
-                String archivo = leerTexto("Archivo usuarios a cargar: ");
-                club.cargarUsuarios(archivo);
-                System.out.println("Carga de usuarios ejecutada.");
-            }
-            case 4 -> {
-                String archivo = leerTexto("Archivo usuarios destino: ");
-                club.salvarUsuarios(archivo);
-                System.out.println("Guardado de usuarios ejecutado.");
-            }
+    	club.salvarUsuarios(RUTA_USUARIOS);
+    	System.out.println("Guardado de usuarios ejecutado.");
+        club.salvarClubDeportivo(RUTA_CLUB);
+        System.out.println("Guardado de datos ejecutado.");
+        tienda.salvarTienda(RUTA_TIENDA);
+        System.out.println("Guardado de tiendas ejecutado.");
         }
-    }
 
     private List<Socio> pedirNominaJugadores() {
         List<Socio> nomina = new ArrayList<>();
@@ -473,6 +472,28 @@ public class Consola {
         return nomina;
     }
 
+    
+    
+    
+    // ==========================================
+    // MÉTODOS AUXILIARES
+    // ==========================================
+
+    private int obtenerMaxId(Iterable<String> llaves) {
+        int max = 0;
+        if (llaves != null) {
+            for (String key : llaves) {
+                int idNum = Integer.parseInt(key);
+                if (idNum > max) {
+                    max = idNum;
+                }
+            }
+        }
+        return max;
+    }
+    
+    
+    
     // ==========================================
     // MÉTODOS AUXILIARES DE LECTURA ROBUSTA
     // ==========================================
@@ -505,4 +526,5 @@ public class Consola {
             }
         }
     }
+    
 }

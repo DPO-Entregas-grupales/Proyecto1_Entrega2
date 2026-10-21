@@ -1,0 +1,42 @@
+[
+  {
+    "idUsuario": "1",
+    "apellido": "Pérez",
+    "contrasena": "1234",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 150,
+    "login": "cperez",
+    "nombre": "Carlos",
+    "edad": 28,
+    "activo": true
+  },
+  {
+    "idUsuario": "2",
+    "apellido": "Gómez",
+    "contrasena": "abcd",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 200,
+    "login": "agomez",
+    "nombre": "Ana",
+    "edad": 24,
+    "activo": true
+  },
+  {
+    "idUsuario": "3",
+    "apellido": "Martínez",
+    "contrasena": "coach123",
+    "tipoUsuario": "Entrenador",
+    "puntosFidelidad": 50,
+    "login": "rmartinez",
+    "nombre": "Roberto"
+  },
+  {
+    "idUsuario": "4",
+    "apellido": "Rodríguez",
+    "contrasena": "fisio2026",
+    "tipoUsuario": "Fisioterapeuta",
+    "puntosFidelidad": 20,
+    "login": "lrodriguez",
+    "nombre": "Laura"
+  }
+]

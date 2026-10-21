@@ -1,0 +1,130 @@
+{
+    "reservas": [],
+    "instalaciones": [
+        {
+            "tipo": "Cancha de Fútbol",
+            "horarios": [
+                {
+                    "fecha": "2026-10-25",
+                    "hora": "17",
+                    "disponible": true
+                },
+                {
+                    "fecha": "2026-10-25",
+                    "hora": "16",
+                    "disponible": false
+                }
+            ],
+            "esTechada": false,
+            "nombre": "Cancha Principal 1",
+            "capacidadMaximaJugadores": 22
+        },
+        {
+            "tipo": "Cancha de Raqueta",
+            "horarios": [],
+            "esTechada": true,
+            "nombre": "Cancha de Tenis A",
+            "capacidadMaximaJugadores": 4
+        }
+    ],
+    "deportes": [
+        {
+            "minJugadores": 11,
+            "permiteEmpate": true,
+            "puntosDerrota": 0,
+            "posiciones": [],
+            "puntosEmpate": 1,
+            "nombreDeporte": "Fútbol",
+            "puntosVictoria": 3
+        },
+        {
+            "minJugadores": 1,
+            "permiteEmpate": false,
+            "puntosDerrota": 0,
+            "posiciones": [],
+            "puntosEmpate": 0,
+            "nombreDeporte": "Tenis",
+            "puntosVictoria": 2
+        }
+    ],
+    "competencias": [{
+        "anioTemporada": "2026",
+        "formato": "Eliminatoria",
+        "categoria": 1,
+        "nombreCompetencia": "Copa Séneca 2026",
+        "entidadOrganizadora": "Club Deportivo Séneca",
+        "faseActual": "Fase de Grupos"
+    }],
+    "partidos": [{
+        "fecha": "2026-10-18",
+        "tipoPartido": "INTERNO",
+        "marcadorFinal": "2-1",
+        "idPartido": "1",
+        "estadoPartido": "Finalizado",
+        "nombreEquipo1": "Leones FC",
+        "nombreEquipo2": "Águilas FC"
+    }],
+    "inscripcionesEquipo": [{
+        "posicion": "Delantero",
+        "numeroCamiseta": 9,
+        "nombreEquipo": "Leones FC",
+        "tarjetasAmarillasAcumuladas": 1,
+        "idSocio": "1"
+    }],
+    "inscripcionesIndividual": [{
+        "puntajeRanking": 1450.5,
+        "idSocio": "2",
+        "nombreDeporte": "Tenis",
+        "nivel": "Avanzado"
+    }],
+    "estadisticas": [{
+        "tarjetasRojas": 0,
+        "idEstadistica": "EST-1",
+        "tarjetasAmarillas": 1,
+        "tipoEstadistica": "FUTBOL",
+        "idSocio": "1",
+        "idPartido": "1",
+        "goles": 2,
+        "asistencias": 0
+    }],
+    "asistenciaEvaluaciones": [{
+        "estadoAsistencia": "Asistió",
+        "notaDesempeno": 4.5,
+        "idEntrenamiento": "1",
+        "idSocio": "1",
+        "comentario": "Excelente rendimiento físico"
+    }],
+    "inscripcionesCompetencia": [{
+        "posicion": "1",
+        "nombreEquipo": "Leones FC",
+        "nombreCompetencia": "Copa Séneca 2026",
+        "puntosAcumulados": 6
+    }],
+    "turnos": [{
+        "diaSemana": 1,
+        "esDiurno": true,
+        "idTurno": "T1"
+    }],
+    "sesionesEntrenamiento": [{
+        "fecha": "2026-10-22",
+        "hora": "08:00",
+        "idEntrenamiento": "1",
+        "idEntrenador": "3",
+        "duracionMinutos": 90
+    }],
+    "solicitudesCambioTurno": [],
+    "equipos": [
+        {
+            "cupoMaximo": 18,
+            "nombreEquipo": "Leones FC",
+            "nombreDeporte": "Fútbol",
+            "categoriaEdad": 25
+        },
+        {
+            "cupoMaximo": 18,
+            "nombreEquipo": "Águilas FC",
+            "nombreDeporte": "Fútbol",
+            "categoriaEdad": 25
+        }
+    ]
+}

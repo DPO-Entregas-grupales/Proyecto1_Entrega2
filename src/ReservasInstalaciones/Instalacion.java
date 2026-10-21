@@ -1,84 +1,65 @@
 package ReservasInstalaciones;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class Instalacion {
-	private String nombre;
-	private String tipo;
-	private boolean esTechado;
-	private int capacidadMaximaJugadores;
-	private Map<String, Boolean> horariosDisponibles;
-	
-	public Instalacion(String nombre, String tipo, boolean esTechado, int capacidadMaximaJugadores) {
-		this.nombre = nombre;
-		this.tipo = tipo;
-		this.esTechado = esTechado;
-		this.capacidadMaximaJugadores = capacidadMaximaJugadores;
-		this.horariosDisponibles = new HashMap<>();
-	}
+    private String nombre;
+    private String tipo;
+    private boolean esTechado;
+    private int capacidadMaximaJugadores;
+    // Mapa que almacena Key: "YYYY-MM-DD_HORA", Value: Boolean (true si está disponible, false si está ocupado)
+    private Map<String, Boolean> horarios;
 
-	public String getNombre() {
-		return nombre;
-	}
+    public Instalacion(String nombre, String tipo, boolean esTechado, int capacidadMaximaJugadores) {
+        this.nombre = nombre;
+        this.tipo = tipo;
+        this.esTechado = esTechado;
+        this.capacidadMaximaJugadores = capacidadMaximaJugadores;
+        this.horarios = new HashMap<>();
+    }
 
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
+    public void crearHorario(String fecha, int hora) {
+        String clave = fecha + "_" + hora;
+        if (!horarios.containsKey(clave)) {
+            horarios.put(clave, true);
+        }
+    }
 
-	public String getTipo() {
-		return tipo;
-	}
+    public void agregarHorarioEstado(String fecha, String hora, boolean disponible) {
+        String clave = fecha + "_" + hora;
+        horarios.put(clave, disponible);
+    }
 
-	public void setTipo(String tipo) {
-		this.tipo = tipo;
-	}
+    public boolean horarioExiste(String fecha, String hora) {
+        return horarios.containsKey(fecha + "_" + hora);
+    }
 
-	public boolean isEsTechado() {
-		return esTechado;
-	}
+    public boolean sePuedeCrearReserva(String fecha, String hora) {
+        String clave = fecha + "_" + hora;
+        Boolean disponible = horarios.get(clave);
+        return disponible != null && disponible;
+    }
 
-	public void setEsTechado(boolean esTechado) {
-		this.esTechado = esTechado;
-	}
+    public void utilizarHorario(String fecha, String hora) {
+        String clave = fecha + "_" + hora;
+        horarios.put(clave, false);
+    }
 
-	public int getCapacidadMaximaJugadores() {
-		return capacidadMaximaJugadores;
-	}
+    public Map<String, Boolean> getHorarios() {
+        return horarios;
+    }
 
-	public void setCapacidadMaximaJugadores(int capacidadMaximaJugadores) {
-		this.capacidadMaximaJugadores = capacidadMaximaJugadores;
-	}
+    // Getters y Setters
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
 
-	public Map<String, Boolean> getHorariosDisponibles() {
-		return horariosDisponibles;
-	}
+    public String getTipo() { return tipo; }
+    public void setTipo(String tipo) { this.tipo = tipo; }
 
-	public void crearHorario(String fecha, int horaInicio){
-		this.horariosDisponibles.put( fecha + horaInicio,true);
-	}
-	
-	public boolean horarioExiste(String fecha, String horaInicio) {
-		if( fecha!=null && horaInicio !=null) {
-			if(horariosDisponibles.containsKey(fecha+horaInicio)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	public boolean sePuedeCrearReserva(String fecha, String horaInicio) {
-		if(horariosDisponibles!= null && fecha != null) {
-			if(horarioExiste(fecha, horaInicio)) {
-				return false;
-			}
-			if(horariosDisponibles.get(fecha+horaInicio)== false) {
-				return false;
-			}
-		}
-		return true;
-	}
-	public void utilizarHorario(String fecha, String horaInicio){
+    public boolean isEsTechado() { return esTechado; }
+    public void setEsTechado(boolean esTechado) { this.esTechado = esTechado; }
 
-		this.horariosDisponibles.put( fecha + horaInicio,false);
-
-		}
+    public int getCapacidadMaximaJugadores() { return capacidadMaximaJugadores; }
+    public void setCapacidadMaximaJugadores(int capacidadMaximaJugadores) { this.capacidadMaximaJugadores = capacidadMaximaJugadores; }
 }

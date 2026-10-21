@@ -9,6 +9,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import Modelo.ClubDeportivoSeneca;
+import Usuarios.Entrenador;
+import Usuarios.Fisioterapeuta;
+import Usuarios.Socio;
 import Usuarios.Usuario;
 
 public class PersistenciaUsuariosJson {
@@ -65,12 +68,25 @@ public class PersistenciaUsuariosJson {
                 jUsuario.put(LOGIN, usuario.getLogin());
                 jUsuario.put(CONTRASENA, usuario.getContraseña());
                 jUsuario.put(PUNTOS_FIDELIDAD, usuario.getPuntosFidelidad());
+                
+                // Determinar tipo de usuario
+                if (usuario instanceof Socio) {
+                    Socio s = (Socio) usuario;
+                    jUsuario.put(TIPO_USUARIO, "Socio");
+                    jUsuario.put(EDAD, s.getEdad());
+                    jUsuario.put(ACTIVO, s.isActivo());
+                } else if (usuario instanceof Entrenador) {
+                    jUsuario.put(TIPO_USUARIO, "Entrenador");
+                } else if (usuario instanceof Fisioterapeuta) {
+                    jUsuario.put(TIPO_USUARIO, "Fisioterapeuta");
+                }
+
                 jUsuarios.put(jUsuario);
             }
         }
 
-        PrintWriter pw = new PrintWriter(archivo);
-        jUsuarios.write(pw, 2, 0);
-        pw.close();
+        try (PrintWriter pw = new PrintWriter(archivo)) {
+            jUsuarios.write(pw, 2, 0);
+        }
     }
 }

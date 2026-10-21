@@ -1,0 +1,42 @@
+{
+    "articulosTienda": [
+        {
+            "precioBase": 320000,
+            "categoria": "Tenis",
+            "cantidadInventario": 8,
+            "nombre": "Raqueta de Tenis Pro"
+        },
+        {
+            "precioBase": 85000,
+            "categoria": "Deportes de Equipo",
+            "cantidadInventario": 20,
+            "nombre": "Balón de Fútbol N° 5"
+        }
+    ],
+    "productosCafeteria": [
+        {
+            "precioBase": 4500,
+            "cantidadInventario": 50,
+            "alergenos": "Ninguno",
+            "nombre": "Café Americano",
+            "esBebidaCaliente": true
+        },
+        {
+            "precioBase": 12000,
+            "cantidadInventario": 15,
+            "alergenos": "Lácteos, Gluten",
+            "nombre": "Sándwich de Jamón y Queso",
+            "esBebidaCaliente": false
+        }
+    ],
+    "ventas": [{
+        "fecha": "2026-10-19",
+        "tipo": "Cafeteria",
+        "hora": 10,
+        "items": [{
+            "cantidad": 2,
+            "nombreProducto": "Café Americano"
+        }],
+        "idVenta": "V-100"
+    }]
+}

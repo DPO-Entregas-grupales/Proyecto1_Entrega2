@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -22,11 +23,18 @@ import Deportes.InscripcionCompetencia;
 import ReservasInstalaciones.Instalacion;
 import ReservasInstalaciones.Reserva;
 import Partidos.Partido;
+import Partidos.PartidoCompetencia;
+import Partidos.PartidoIndividual;
+import Partidos.PartidoInterno;
 import Turnos.Turno;
 import Turnos.SolicitudCambioTurnos;
 import SesionEntrenamiento.SesionEntrenamiento;
 import SesionEntrenamiento.AsistenciaEvaluacion;
 import Estadisticas.Estadistica;
+import Estadisticas.EstadisticaFutbol;
+import Estadisticas.EstadisticaVoleibol;
+import Estadisticas.EstadisticaRaqueta;
+import Estadisticas.EstadisticaBaloncesto;
 
 public class PersistenciaClubDeportivoJson {
 
@@ -54,6 +62,10 @@ public class PersistenciaClubDeportivoJson {
     public void salvarUsuarios(ClubDeportivoSeneca club, String archivo) throws IOException {
         persistenciaUsuarios.salvarUsuarios(club, archivo);
     }
+
+    // ==========================================
+    // MÉTODOS DE CARGA
+    // ==========================================
 
     public void cargarClubDeportivo(ClubDeportivoSeneca club, String archivo) throws IOException {
         String jsonCompleto = new String(Files.readAllBytes(new File(archivo).toPath()));
@@ -169,6 +181,18 @@ public class PersistenciaClubDeportivoJson {
             int capacidad = jObj.getInt("capacidadMaximaJugadores");
 
             club.crearInstalacion(nombre, tipo, esTechada, capacidad);
+            Instalacion instalacion = club.getInstalaciones().get(nombre);
+
+            if (instalacion != null && jObj.has("horarios")) {
+                JSONArray jHorarios = jObj.getJSONArray("horarios");
+                for (int k = 0; k < jHorarios.length(); k++) {
+                    JSONObject jHorario = jHorarios.getJSONObject(k);
+                    String fecha = jHorario.getString("fecha");
+                    String hora = jHorario.getString("hora");
+                    boolean disponible = jHorario.getBoolean("disponible");
+                    instalacion.agregarHorarioEstado(fecha, hora, disponible);
+                }
+            }
         }
     }
 
@@ -298,10 +322,34 @@ public class PersistenciaClubDeportivoJson {
         }
     }
 
+    // ==========================================
+    // MÉTODOS DE GUARDADO
+    // ==========================================
+
     public void salvarClubDeportivo(ClubDeportivoSeneca club, String archivo) throws IOException {
         JSONObject raiz = new JSONObject();
 
-        // Deportes
+        salvarDeportes(club, raiz);
+        salvarEquipos(club, raiz);
+        salvarCompetencias(club, raiz);
+        salvarInscripcionesIndividual(club, raiz);
+        salvarInscripcionesEquipo(club, raiz);
+        salvarInscripcionesCompetencia(club, raiz);
+        salvarInstalaciones(club, raiz);
+        salvarReservas(club, raiz);
+        salvarPartidos(club, raiz);
+        salvarSesionesEntrenamiento(club, raiz);
+        salvarAsistenciaEvaluaciones(club, raiz);
+        salvarTurnos(club, raiz);
+        salvarSolicitudesCambioTurno(club, raiz);
+        salvarEstadisticas(club, raiz);
+
+        try (PrintWriter pw = new PrintWriter(archivo)) {
+            pw.println(raiz.toString(4));
+        }
+    }
+
+    private void salvarDeportes(ClubDeportivoSeneca club, JSONObject raiz) {
         JSONArray jDeportes = new JSONArray();
         for (Deporte dep : club.getDeportes().values()) {
             JSONObject jDep = new JSONObject();
@@ -315,8 +363,9 @@ public class PersistenciaClubDeportivoJson {
             jDeportes.put(jDep);
         }
         raiz.put(DEPORTES, jDeportes);
+    }
 
-        // Equipos
+    private void salvarEquipos(ClubDeportivoSeneca club, JSONObject raiz) {
         JSONArray jEquipos = new JSONArray();
         for (Equipo eq : club.getEquipos().values()) {
             JSONObject jEq = new JSONObject();
@@ -329,8 +378,9 @@ public class PersistenciaClubDeportivoJson {
             jEquipos.put(jEq);
         }
         raiz.put(EQUIPOS, jEquipos);
+    }
 
-        // Competencias
+    private void salvarCompetencias(ClubDeportivoSeneca club, JSONObject raiz) {
         JSONArray jCompetencias = new JSONArray();
         for (Competencia comp : club.getCompetencias().values()) {
             JSONObject jComp = new JSONObject();
@@ -343,8 +393,9 @@ public class PersistenciaClubDeportivoJson {
             jCompetencias.put(jComp);
         }
         raiz.put(COMPETENCIAS, jCompetencias);
+    }
 
-        // Inscripciones Individuales
+    private void salvarInscripcionesIndividual(ClubDeportivoSeneca club, JSONObject raiz) {
         JSONArray jInscInd = new JSONArray();
         for (InscripcionIndividual ii : club.getInscripcionesIndividual()) {
             JSONObject jObj = new JSONObject();
@@ -355,8 +406,9 @@ public class PersistenciaClubDeportivoJson {
             jInscInd.put(jObj);
         }
         raiz.put(INSCRIPCIONES_INDIVIDUAL, jInscInd);
+    }
 
-        // Inscripciones Equipo
+    private void salvarInscripcionesEquipo(ClubDeportivoSeneca club, JSONObject raiz) {
         JSONArray jInscEq = new JSONArray();
         for (InscripcionEquipo ie : club.getInscripcionesEquipo()) {
             JSONObject jObj = new JSONObject();
@@ -368,8 +420,9 @@ public class PersistenciaClubDeportivoJson {
             jInscEq.put(jObj);
         }
         raiz.put(INSCRIPCIONES_EQUIPO, jInscEq);
+    }
 
-        // Inscripciones Competencia
+    private void salvarInscripcionesCompetencia(ClubDeportivoSeneca club, JSONObject raiz) {
         JSONArray jInscComp = new JSONArray();
         for (InscripcionCompetencia ic : club.getInscripcionesCompetencia()) {
             JSONObject jObj = new JSONObject();
@@ -380,10 +433,172 @@ public class PersistenciaClubDeportivoJson {
             jInscComp.put(jObj);
         }
         raiz.put(INSCRIPCIONES_COMPETENCIA, jInscComp);
+    }
 
-        // Guardar en archivo JSON con formato indentado
-        try (PrintWriter pw = new PrintWriter(archivo)) {
-            pw.println(raiz.toString(4));
+    private void salvarInstalaciones(ClubDeportivoSeneca club, JSONObject raiz) {
+        JSONArray jInstalaciones = new JSONArray();
+        for (Instalacion inst : club.getInstalaciones().values()) {
+            JSONObject jObj = new JSONObject();
+            jObj.put("nombre", inst.getNombre());
+            jObj.put("tipo", inst.getTipo());
+            jObj.put("esTechada", inst.isEsTechado());
+            jObj.put("capacidadMaximaJugadores", inst.getCapacidadMaximaJugadores());
+
+            JSONArray jHorarios = new JSONArray();
+            if (inst.getHorarios() != null) {
+                for (Map.Entry<String, Boolean> entry : inst.getHorarios().entrySet()) {
+                    String[] partes = entry.getKey().split("_");
+                    if (partes.length == 2) {
+                        JSONObject jHorario = new JSONObject();
+                        jHorario.put("fecha", partes[0]);
+                        jHorario.put("hora", partes[1]);
+                        jHorario.put("disponible", entry.getValue());
+                        jHorarios.put(jHorario);
+                    }
+                }
+            }
+            jObj.put("horarios", jHorarios);
+            jInstalaciones.put(jObj);
         }
+        raiz.put(INSTALACIONES, jInstalaciones);
+    }
+
+    private void salvarReservas(ClubDeportivoSeneca club, JSONObject raiz) {
+        JSONArray jReservas = new JSONArray();
+        for (Reserva res : club.getReservas().values()) {
+            JSONObject jObj = new JSONObject();
+            jObj.put("idReserva", res.getIdReserva());
+            if (res.getSocio() != null) jObj.put("idSocio", res.getSocio().getIdUsuario());
+            if (res.getInstalacion() != null) jObj.put("nombreInstalacion", res.getInstalacion().getNombre());
+            jObj.put("fecha", res.getFecha());
+            jObj.put("horaInicio", res.getHoraInicio());
+            jObj.put("cantidadJugadores", res.getCantidadJugadores());
+            jObj.put("modalidad", res.getModalidad());
+            jReservas.put(jObj);
+        }
+        raiz.put(RESERVAS, jReservas);
+    }
+
+    private void salvarPartidos(ClubDeportivoSeneca club, JSONObject raiz) {
+        JSONArray jPartidos = new JSONArray();
+        for (Partido par : club.getPartidos().values()) {
+            JSONObject jObj = new JSONObject();
+            jObj.put("idPartido", par.getIdPartido());
+            jObj.put("fecha", par.getFecha());
+            jObj.put("marcadorFinal", par.getMarcadorFinal());
+            jObj.put("estadoPartido", par.getEstadoPartido());
+
+            if (par instanceof PartidoCompetencia) {
+                PartidoCompetencia pc = (PartidoCompetencia) par;
+                jObj.put("tipoPartido", "COMPETENCIA");
+                if (pc.getEquipo() != null) jObj.put("nombreEquipo", pc.getEquipo().getNombreEquipo());
+                jObj.put("institucionRival", pc.getInstitucionRival());
+                jObj.put("escenario", pc.getEscenario());
+            } else if (par instanceof PartidoInterno) {
+                PartidoInterno pi = (PartidoInterno) par;
+                jObj.put("tipoPartido", "INTERNO");
+                if (pi.getEquipo1() != null) jObj.put("nombreEquipo1", pi.getEquipo1().getNombreEquipo());
+                if (pi.getEquipo2() != null) jObj.put("nombreEquipo2", pi.getEquipo2().getNombreEquipo());
+            } else if (par instanceof PartidoIndividual) {
+                PartidoIndividual pin = (PartidoIndividual) par;
+                jObj.put("tipoPartido", "INDIVIDUAL");
+                if (pin.getSocio1() != null) jObj.put("idUsuario1", pin.getSocio1().getIdUsuario());
+                if (pin.getSocio2() != null) jObj.put("idUsuario2", pin.getSocio2().getIdUsuario());
+            }
+            jPartidos.put(jObj);
+        }
+        raiz.put(PARTIDOS, jPartidos);
+    }
+
+    private void salvarSesionesEntrenamiento(ClubDeportivoSeneca club, JSONObject raiz) {
+        JSONArray jSesiones = new JSONArray();
+        for (SesionEntrenamiento se : club.getSesionesEntrenamiento().values()) {
+            JSONObject jObj = new JSONObject();
+            jObj.put("idEntrenamiento", se.getIdEntrenamiento());
+            jObj.put("fecha", se.getFecha());
+            jObj.put("hora", se.getHora());
+            jObj.put("duracionMinutos", se.getDuracionMinutos());
+            if (se.getEntrenador() != null) jObj.put("idEntrenador", se.getEntrenador().getIdUsuario());
+            jSesiones.put(jObj);
+        }
+        raiz.put(SESIONES_ENTRENAMIENTO, jSesiones);
+    }
+
+    private void salvarAsistenciaEvaluaciones(ClubDeportivoSeneca club, JSONObject raiz) {
+        JSONArray jAsistencias = new JSONArray();
+        for (AsistenciaEvaluacion ae : club.getAsistenciaEvaluaciones()) {
+            JSONObject jObj = new JSONObject();
+            jObj.put("estadoAsistencia", ae.getEstadoAsistencia());
+            jObj.put("notaDesempeno", ae.getNotaDesempeno());
+            jObj.put("comentario", ae.getComentario());
+            if (ae.getSocio() != null) jObj.put("idSocio", ae.getSocio().getIdUsuario());
+            if (ae.getSesionEntrenamiento() != null) jObj.put("idEntrenamiento", ae.getSesionEntrenamiento().getIdEntrenamiento());
+            jAsistencias.put(jObj);
+        }
+        raiz.put(ASISTENCIA_EVALUACIONES, jAsistencias);
+    }
+
+    private void salvarTurnos(ClubDeportivoSeneca club, JSONObject raiz) {
+        JSONArray jTurnos = new JSONArray();
+        for (Turno tur : club.getTurnos().values()) {
+            JSONObject jObj = new JSONObject();
+            jObj.put("idTurno", tur.getIdTurno());
+            jObj.put("diaSemana", tur.getDiaSemana());
+            jObj.put("esDiurno", tur.isEsDiurno());
+            jTurnos.put(jObj);
+        }
+        raiz.put(TURNOS, jTurnos);
+    }
+
+    private void salvarSolicitudesCambioTurno(ClubDeportivoSeneca club, JSONObject raiz) {
+        JSONArray jSolicitudes = new JSONArray();
+        for (SolicitudCambioTurnos sct : club.getSolicitudesCambioTurno()) {
+            JSONObject jObj = new JSONObject();
+            jObj.put("idEmpleado", sct.getidEmpleado());
+            jObj.put("idTurnoActual", sct.getIdTurnoActual());
+            jObj.put("idTurnoCambio", sct.getIdTurnoCambio());
+            jObj.put("esAprobada", sct.isEsAprobado());
+            jSolicitudes.put(jObj);
+        }
+        raiz.put(SOLICITUDES_CAMBIO_TURNO, jSolicitudes);
+    }
+
+    private void salvarEstadisticas(ClubDeportivoSeneca club, JSONObject raiz) {
+        JSONArray jEstadisticas = new JSONArray();
+        for (Estadistica est : club.getEstadisticas()) {
+            JSONObject jObj = new JSONObject();
+            jObj.put("idEstadistica", est.getIdEstadistica());
+            if (est.getSocio() != null) jObj.put("idSocio", est.getSocio().getIdUsuario());
+            if (est.getPartido() != null) jObj.put("idPartido", est.getPartido().getIdPartido());
+
+            if (est instanceof EstadisticaFutbol) {
+                EstadisticaFutbol ef = (EstadisticaFutbol) est;
+                jObj.put("tipoEstadistica", "FUTBOL");
+                jObj.put("goles", ef.getGoles());
+                jObj.put("asistencias", ef.getAsistencias());
+                jObj.put("tarjetasAmarillas", ef.getTarjetasAmarillas());
+                jObj.put("tarjetasRojas", ef.getTarjetasRojas());
+            } else if (est instanceof EstadisticaVoleibol) {
+                EstadisticaVoleibol ev = (EstadisticaVoleibol) est;
+                jObj.put("tipoEstadistica", "VOLEIBOL");
+                jObj.put("aces", ev.getAces());
+                jObj.put("bloqueos", ev.getBloqueos());
+            } else if (est instanceof EstadisticaRaqueta) {
+                EstadisticaRaqueta er = (EstadisticaRaqueta) est;
+                jObj.put("tipoEstadistica", "RAQUETA");
+                jObj.put("setGanados", er.getSetGanados());
+                jObj.put("gamesGanados", er.getGamesGanados());
+                jObj.put("aces", er.getAces());
+                jObj.put("erroresNoForzados", er.getErroresNoForzados());
+                jObj.put("puntosTotales", er.getPuntosTotales());
+            } else if (est instanceof EstadisticaBaloncesto) {
+                EstadisticaBaloncesto eb = (EstadisticaBaloncesto) est;
+                jObj.put("tipoEstadistica", "BALONCESTO");
+                jObj.put("puntos", eb.getPuntos());
+                jObj.put("rebotes", eb.getRebotes());
+            }
+            jEstadisticas.put(jObj);
+        }
+        raiz.put(ESTADISTICAS, jEstadisticas);
     }
 }

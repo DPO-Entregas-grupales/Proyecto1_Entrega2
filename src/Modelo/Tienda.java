@@ -66,7 +66,7 @@ public class Tienda {
         }
 
         double imp = (impuesto != null) ? impuesto : 0.08;
-        Venta venta = new Venta(idVenta, fecha, hora, imp, usuario, codigoDescuento);
+        Venta venta = new Venta(idVenta, fecha, hora, tipo, usuario);
         venta.setItemsVenta(itemsVenta);
 
         if (Venta.CAFETERIA.equalsIgnoreCase(tipo)) {
@@ -90,14 +90,13 @@ public class Tienda {
         }
     }
 
-    public void realizarVentaConPuntos(String idVenta, String fecha, int hora, Double impuesto, String idUsuario, String codigoDescuento, List<ItemVenta> itemsVenta, ClubDeportivoSeneca clubDeportivo, String tipo) {
+    public void realizarVentaConPuntos(String idVenta, String fecha, int hora, String idUsuario, String codigoDescuento, List<ItemVenta> itemsVenta, ClubDeportivoSeneca clubDeportivo, String tipo) {
         Usuario usuario = null;
         if (clubDeportivo != null && clubDeportivo.getUsuarios() != null) {
             usuario = clubDeportivo.getUsuarios().get(idUsuario);
         }
 
-        double imp = (impuesto != null) ? impuesto : 0.08;
-        Venta venta = new Venta(idVenta, fecha, hora, imp, usuario, codigoDescuento);
+        Venta venta = new Venta(idVenta, fecha, hora, tipo, usuario);
         venta.setItemsVenta(itemsVenta);
 
         if (Venta.CAFETERIA.equalsIgnoreCase(tipo)) {
@@ -124,21 +123,14 @@ public class Tienda {
         }
     }
 
-    public void crearVenta(String idVenta, String fecha, int hora, Double impuesto, String idUsuario, String codigoDescuento, List<ItemVenta> itemsVenta, ClubDeportivoSeneca clubDeportivo, String tipo) {
+    public void crearVenta(String idVenta, String fecha, int hora, String idUsuario, String codigoDescuento, List<ItemVenta> itemsVenta, ClubDeportivoSeneca clubDeportivo, String tipo) {
         Usuario usuario = null;
         if (clubDeportivo != null && clubDeportivo.getUsuarios() != null) {
             usuario = clubDeportivo.getUsuarios().get(idUsuario);
         }
 
-        double imp = (impuesto != null) ? impuesto : 0.08;
-        Venta venta = new Venta(idVenta, fecha, hora, imp, usuario, codigoDescuento);
+        Venta venta = new Venta(idVenta, fecha, hora, tipo, usuario);
         venta.setItemsVenta(itemsVenta);
-
-        if (Venta.CAFETERIA.equalsIgnoreCase(tipo)) {
-            venta.realizarCalculosVentaCafeteria(itemsVenta);
-        } else {
-            venta.realizarCalculosVentaTiendaDeportiva(itemsVenta, codigoDescuento, this.calculadoraDescuento);
-        }
 
         agregarVenta(venta);
 
