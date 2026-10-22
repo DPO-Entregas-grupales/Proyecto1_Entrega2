@@ -1,5 +1,6 @@
 package ReservasInstalaciones;
 import Usuarios.Socio;
+import java.time.LocalDateTime;
 
 public class Reserva {
 	private String idReserva;
@@ -21,6 +22,21 @@ public class Reserva {
 		this.cantidadJugadores = cantidadJugadores;
 		this.modalidad = modalidad;
 	}
+	
+	// La reserva esta activa si su fecha es hoy y su hora de inicio es la hora actual
+	public boolean estaActiva() {
+		LocalDateTime ahora = LocalDateTime.now();
+		if(!ahora.toLocalDate().toString().equals(this.fecha)) {
+			return false;
+		}
+		try {
+			return Integer.parseInt(this.horaInicio.trim()) == ahora.getHour();
+		} catch(NumberFormatException e) {
+			return false;
+		}
+	}
+	
+	
 	public String getIdReserva() {
 		return idReserva;
 	}

@@ -2,6 +2,7 @@ package Partidos;
 
 import Deportes.Deporte;
 import Deportes.Equipo;
+import Deportes.Competencia;
 
 public class PartidoCompetencia extends Partido {
 	
@@ -9,6 +10,7 @@ public class PartidoCompetencia extends Partido {
 	private Equipo equipo;
 	private String institucionRival;
 	private String escenario;
+	private Competencia competencia;
 
 	public PartidoCompetencia(String idPartido, String fecha, String marcadorFinal, String estadoPartido,
 			Deporte deporte, Equipo equipo, String institucionRival, String escenario) {
@@ -41,6 +43,14 @@ public class PartidoCompetencia extends Partido {
 
 	public void setEscenario(String escenario) {
 		this.escenario = escenario;
+	}
+	
+	public Competencia getCompetencia() {
+		return competencia;
+	}
+	
+	public void setCompetencia(Competencia competencia) {
+		this.competencia = competencia;
 	}
 	
 }

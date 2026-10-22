@@ -7,6 +7,7 @@ public class InscripcionEquipo {
 	private int tarjetasAmarillasAcumuladas;
 	private String posicion;
 	private int numeroCamiseta;
+	private boolean estaSuspendido;
 	public InscripcionEquipo(Socio socio, Equipo equipo, String posicion, int numeroCamiseta) {
 		this.socio = socio;
 		this.equipo = equipo;
@@ -44,5 +45,28 @@ public class InscripcionEquipo {
 		this.numeroCamiseta = numeroCamiseta;
 	}
 	
+	public boolean isEstaSuspendido() {
+		return estaSuspendido;
+	}
 	
+	public void setEstaSuspendido(boolean estaSuspendido) {
+		this.estaSuspendido = estaSuspendido;
+	}
+	
+	// Acumula las tarjetas de un partido. Con 2 amarillas acumuladas o una roja el jugador queda suspendido
+	public void registrarTarjetas(int amarillas, int rojas) {
+		this.tarjetasAmarillasAcumuladas += amarillas;
+		if(rojas > 0) {
+			this.estaSuspendido = true;
+		}
+		if(this.tarjetasAmarillasAcumuladas >= 2) {
+			this.estaSuspendido = true;
+			this.tarjetasAmarillasAcumuladas = 0;
+		}
+	}
+	
+	// Cuando el jugador ya cumplio su suspension con el partido de su equipo
+	public void cumplirSuspension() {
+		this.estaSuspendido = false;
+	}
 }

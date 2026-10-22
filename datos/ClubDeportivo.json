@@ -1,130 +1,314 @@
-{
-    "reservas": [],
-    "instalaciones": [
-        {
-            "tipo": "Cancha de Fútbol",
-            "horarios": [
-                {
-                    "fecha": "2026-10-25",
-                    "hora": "17",
-                    "disponible": true
-                },
-                {
-                    "fecha": "2026-10-25",
-                    "hora": "16",
-                    "disponible": false
-                }
-            ],
-            "esTechada": false,
-            "nombre": "Cancha Principal 1",
-            "capacidadMaximaJugadores": 22
-        },
-        {
-            "tipo": "Cancha de Raqueta",
-            "horarios": [],
-            "esTechada": true,
-            "nombre": "Cancha de Tenis A",
-            "capacidadMaximaJugadores": 4
-        }
-    ],
-    "deportes": [
-        {
-            "minJugadores": 11,
-            "permiteEmpate": true,
-            "puntosDerrota": 0,
-            "posiciones": [],
-            "puntosEmpate": 1,
-            "nombreDeporte": "Fútbol",
-            "puntosVictoria": 3
-        },
-        {
-            "minJugadores": 1,
-            "permiteEmpate": false,
-            "puntosDerrota": 0,
-            "posiciones": [],
-            "puntosEmpate": 0,
-            "nombreDeporte": "Tenis",
-            "puntosVictoria": 2
-        }
-    ],
-    "competencias": [{
-        "anioTemporada": "2026",
-        "formato": "Eliminatoria",
-        "categoria": 1,
-        "nombreCompetencia": "Copa Séneca 2026",
-        "entidadOrganizadora": "Club Deportivo Séneca",
-        "faseActual": "Fase de Grupos"
-    }],
-    "partidos": [{
-        "fecha": "2026-10-18",
-        "tipoPartido": "INTERNO",
-        "marcadorFinal": "2-1",
-        "idPartido": "1",
-        "estadoPartido": "Finalizado",
-        "nombreEquipo1": "Leones FC",
-        "nombreEquipo2": "Águilas FC"
-    }],
-    "inscripcionesEquipo": [{
-        "posicion": "Delantero",
-        "numeroCamiseta": 9,
-        "nombreEquipo": "Leones FC",
-        "tarjetasAmarillasAcumuladas": 1,
-        "idSocio": "1"
-    }],
-    "inscripcionesIndividual": [{
-        "puntajeRanking": 1450.5,
-        "idSocio": "2",
-        "nombreDeporte": "Tenis",
-        "nivel": "Avanzado"
-    }],
-    "estadisticas": [{
-        "tarjetasRojas": 0,
-        "idEstadistica": "EST-1",
-        "tarjetasAmarillas": 1,
-        "tipoEstadistica": "FUTBOL",
-        "idSocio": "1",
-        "idPartido": "1",
-        "goles": 2,
-        "asistencias": 0
-    }],
-    "asistenciaEvaluaciones": [{
-        "estadoAsistencia": "Asistió",
-        "notaDesempeno": 4.5,
-        "idEntrenamiento": "1",
-        "idSocio": "1",
-        "comentario": "Excelente rendimiento físico"
-    }],
-    "inscripcionesCompetencia": [{
-        "posicion": "1",
-        "nombreEquipo": "Leones FC",
-        "nombreCompetencia": "Copa Séneca 2026",
-        "puntosAcumulados": 6
-    }],
-    "turnos": [{
-        "diaSemana": 1,
-        "esDiurno": true,
-        "idTurno": "T1"
-    }],
-    "sesionesEntrenamiento": [{
-        "fecha": "2026-10-22",
-        "hora": "08:00",
-        "idEntrenamiento": "1",
-        "idEntrenador": "3",
-        "duracionMinutos": 90
-    }],
-    "solicitudesCambioTurno": [],
-    "equipos": [
-        {
-            "cupoMaximo": 18,
-            "nombreEquipo": "Leones FC",
-            "nombreDeporte": "Fútbol",
-            "categoriaEdad": 25
-        },
-        {
-            "cupoMaximo": 18,
-            "nombreEquipo": "Águilas FC",
-            "nombreDeporte": "Fútbol",
-            "categoriaEdad": 25
-        }
-    ]
-}
+[
+  {
+    "idUsuario": "1",
+    "nombre": "Administrador",
+    "apellido": "Sistema",
+    "login": "admin",
+    "contrasena": "admin123",
+    "tipoUsuario": "Administrador",
+    "puntosFidelidad": 0
+  },
+  {
+    "idUsuario": "2",
+    "nombre": "Roberto",
+    "apellido": "Martínez",
+    "login": "rmartinez",
+    "contrasena": "coach123",
+    "tipoUsuario": "Entrenador",
+    "puntosFidelidad": 50,
+    "codigoDescuento": "COACH15"
+  },
+  {
+    "idUsuario": "3",
+    "nombre": "Camila",
+    "apellido": "Torres",
+    "login": "ctorres",
+    "contrasena": "coach456",
+    "tipoUsuario": "Entrenador",
+    "puntosFidelidad": 0,
+    "codigoDescuento": "CAMI15"
+  },
+  {
+    "idUsuario": "4",
+    "nombre": "Andrés",
+    "apellido": "Ruiz",
+    "login": "aruiz",
+    "contrasena": "coach789",
+    "tipoUsuario": "Entrenador",
+    "puntosFidelidad": 0,
+    "codigoDescuento": "ANDRES15"
+  },
+  {
+    "idUsuario": "5",
+    "nombre": "Laura",
+    "apellido": "Rodríguez",
+    "login": "lrodriguez",
+    "contrasena": "fisio2026",
+    "tipoUsuario": "Fisioterapeuta",
+    "puntosFidelidad": 20,
+    "codigoDescuento": "FISIO15"
+  },
+  {
+    "idUsuario": "6",
+    "nombre": "Pablo",
+    "apellido": "Díaz",
+    "login": "pdiaz",
+    "contrasena": "fisio2027",
+    "tipoUsuario": "Fisioterapeuta",
+    "puntosFidelidad": 0,
+    "codigoDescuento": "PABLO15"
+  },
+  {
+    "idUsuario": "7",
+    "nombre": "Carlos",
+    "apellido": "Pérez",
+    "login": "cperez",
+    "contrasena": "1234",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 150,
+    "edad": 28,
+    "activo": true
+  },
+  {
+    "idUsuario": "8",
+    "nombre": "Ana",
+    "apellido": "Gómez",
+    "login": "agomez",
+    "contrasena": "abcd",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 200,
+    "edad": 24,
+    "activo": true
+  },
+  {
+    "idUsuario": "9",
+    "nombre": "Felipe",
+    "apellido": "Morales",
+    "login": "fmorales",
+    "contrasena": "4321",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "edad": 20,
+    "activo": true
+  },
+  {
+    "idUsuario": "10",
+    "nombre": "Sofía",
+    "apellido": "Ruiz",
+    "login": "sruiz",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "edad": 12,
+    "activo": true
+  },
+  {
+    "idUsuario": "11",
+    "nombre": "Mateo",
+    "apellido": "León",
+    "login": "mleon",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "edad": 14,
+    "activo": true
+  },
+  {
+    "idUsuario": "12",
+    "nombre": "Luis",
+    "apellido": "Vega",
+    "login": "lvega",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "edad": 22,
+    "activo": true
+  },
+  {
+    "idUsuario": "13",
+    "nombre": "Marta",
+    "apellido": "Ortiz",
+    "login": "mortiz",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "edad": 25,
+    "activo": true
+  },
+  {
+    "idUsuario": "14",
+    "nombre": "Diego",
+    "apellido": "Soto",
+    "login": "dsoto",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "edad": 21,
+    "activo": true
+  },
+  {
+    "idUsuario": "15",
+    "nombre": "Juana",
+    "apellido": "Prada",
+    "login": "jprada",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "edad": 30,
+    "activo": false
+  },
+  {
+    "idUsuario": "16",
+    "nombre": "Jugador1",
+    "apellido": "León",
+    "login": "leon1",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "edad": 20,
+    "activo": true
+  },
+  {
+    "idUsuario": "17",
+    "nombre": "Jugador2",
+    "apellido": "León",
+    "login": "leon2",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "edad": 21,
+    "activo": true
+  },
+  {
+    "idUsuario": "18",
+    "nombre": "Jugador3",
+    "apellido": "León",
+    "login": "leon3",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "edad": 22,
+    "activo": true
+  },
+  {
+    "idUsuario": "19",
+    "nombre": "Jugador4",
+    "apellido": "León",
+    "login": "leon4",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "edad": 23,
+    "activo": true
+  },
+  {
+    "idUsuario": "20",
+    "nombre": "Jugador5",
+    "apellido": "León",
+    "login": "leon5",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "edad": 24,
+    "activo": true
+  },
+  {
+    "idUsuario": "21",
+    "nombre": "Jugador6",
+    "apellido": "León",
+    "login": "leon6",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "edad": 25,
+    "activo": true
+  },
+  {
+    "idUsuario": "22",
+    "nombre": "Jugador7",
+    "apellido": "León",
+    "login": "leon7",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "edad": 26,
+    "activo": true
+  },
+  {
+    "idUsuario": "23",
+    "nombre": "Jugador1",
+    "apellido": "Águila",
+    "login": "aguila1",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "edad": 20,
+    "activo": true
+  },
+  {
+    "idUsuario": "24",
+    "nombre": "Jugador2",
+    "apellido": "Águila",
+    "login": "aguila2",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "edad": 21,
+    "activo": true
+  },
+  {
+    "idUsuario": "25",
+    "nombre": "Jugador3",
+    "apellido": "Águila",
+    "login": "aguila3",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "edad": 22,
+    "activo": true
+  },
+  {
+    "idUsuario": "26",
+    "nombre": "Jugador4",
+    "apellido": "Águila",
+    "login": "aguila4",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "edad": 23,
+    "activo": true
+  },
+  {
+    "idUsuario": "27",
+    "nombre": "Jugador5",
+    "apellido": "Águila",
+    "login": "aguila5",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "edad": 24,
+    "activo": true
+  },
+  {
+    "idUsuario": "28",
+    "nombre": "Jugador6",
+    "apellido": "Águila",
+    "login": "aguila6",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "edad": 25,
+    "activo": true
+  },
+  {
+    "idUsuario": "29",
+    "nombre": "Jugador7",
+    "apellido": "Águila",
+    "login": "aguila7",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "edad": 26,
+    "activo": true
+  }
+]

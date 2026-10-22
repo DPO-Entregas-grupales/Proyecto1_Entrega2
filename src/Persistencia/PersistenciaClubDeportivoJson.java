@@ -156,7 +156,12 @@ public class PersistenciaClubDeportivoJson {
             int numeroCamiseta = jObj.getInt("numeroCamiseta");
             int tarjetasAmarillas = jObj.optInt("tarjetasAmarillasAcumuladas", 0);
 
+            int antes = club.getInscripcionesEquipo().size();
             club.crearInscripcionEquipo(idSocio, nombreEquipo, posicion, numeroCamiseta, tarjetasAmarillas);
+            if (club.getInscripcionesEquipo().size() > antes) {
+                InscripcionEquipo creada = club.getInscripcionesEquipo().get(club.getInscripcionesEquipo().size() - 1);
+                creada.setEstaSuspendido(jObj.optBoolean("estaSuspendido", false));
+            }
         }
     }
 
@@ -225,6 +230,10 @@ public class PersistenciaClubDeportivoJson {
                 String institucionRival = jObj.getString("institucionRival");
                 String escenario = jObj.getString("escenario");
                 club.crearPartidoCompetencia(idPartido, fecha, marcadorFinal, estadoPartido, nombreEquipo, institucionRival, escenario);
+                String nombreCompetencia = jObj.optString("nombreCompetencia", "");
+                if (!nombreCompetencia.isEmpty()) {
+                    club.asociarPartidoACompetencia(idPartido, nombreCompetencia);
+                }
             } else if ("INTERNO".equalsIgnoreCase(tipoPartido)) {
                 String nombreEquipo1 = jObj.getString("nombreEquipo1");
                 String nombreEquipo2 = jObj.getString("nombreEquipo2");
@@ -232,7 +241,7 @@ public class PersistenciaClubDeportivoJson {
             } else if ("INDIVIDUAL".equalsIgnoreCase(tipoPartido)) {
                 String idUsuario1 = jObj.getString("idUsuario1");
                 String idUsuario2 = jObj.getString("idUsuario2");
-                club.crearPartidoIndividual(idPartido, fecha, marcadorFinal, estadoPartido, idUsuario1, idUsuario2);
+                club.crearPartidoIndividual(idPartido, fecha, marcadorFinal, estadoPartido, idUsuario1, idUsuario2, jObj.optString("nombreDeporte", ""));
             }
         }
     }
@@ -249,6 +258,16 @@ public class PersistenciaClubDeportivoJson {
             Entrenador entrenador = (Entrenador) club.getUsuarios().get(idEntrenador);
             if (entrenador != null) {
                 club.crearSesionEntrenamiento(idEntrenamiento, fecha, hora, duracion, entrenador);
+                JSONArray jConvocados = jObj.optJSONArray("idSocios");
+                if (jConvocados != null) {
+                    for (int j = 0; j < jConvocados.length(); j++) {
+                        club.insertarSocioEnSesionEntrenamiento(idEntrenamiento, jConvocados.getString(j));
+                    }
+                }
+                String nombreInstalacion = jObj.optString("nombreInstalacion", "");
+                if (!nombreInstalacion.isEmpty()) {
+                    club.asignarInstalacionASesion(idEntrenamiento, nombreInstalacion);
+                }
             }
         }
     }
@@ -274,6 +293,12 @@ public class PersistenciaClubDeportivoJson {
             boolean esDiurno = jObj.getBoolean("esDiurno");
 
             club.crearTurno(idTurno, diaSemana, esDiurno);
+            JSONArray jEmpleados = jObj.optJSONArray("idEmpleados");
+            if (jEmpleados != null) {
+                for (int j = 0; j < jEmpleados.length(); j++) {
+                    club.asignarTurnoAEmpleado(idTurno, jEmpleados.getString(j));
+                }
+            }
         }
     }
 
@@ -417,6 +442,7 @@ public class PersistenciaClubDeportivoJson {
             jObj.put("posicion", ie.getPosicion());
             jObj.put("numeroCamiseta", ie.getNumeroCamiseta());
             jObj.put("tarjetasAmarillasAcumuladas", ie.getTarjetasAmarillasAcumuladas());
+            jObj.put("estaSuspendido", ie.isEstaSuspendido());
             jInscEq.put(jObj);
         }
         raiz.put(INSCRIPCIONES_EQUIPO, jInscEq);
@@ -494,6 +520,7 @@ public class PersistenciaClubDeportivoJson {
                 if (pc.getEquipo() != null) jObj.put("nombreEquipo", pc.getEquipo().getNombreEquipo());
                 jObj.put("institucionRival", pc.getInstitucionRival());
                 jObj.put("escenario", pc.getEscenario());
+                if (pc.getCompetencia() != null) jObj.put("nombreCompetencia", pc.getCompetencia().getNombreCompetencia());
             } else if (par instanceof PartidoInterno) {
                 PartidoInterno pi = (PartidoInterno) par;
                 jObj.put("tipoPartido", "INTERNO");
@@ -504,6 +531,7 @@ public class PersistenciaClubDeportivoJson {
                 jObj.put("tipoPartido", "INDIVIDUAL");
                 if (pin.getSocio1() != null) jObj.put("idUsuario1", pin.getSocio1().getIdUsuario());
                 if (pin.getSocio2() != null) jObj.put("idUsuario2", pin.getSocio2().getIdUsuario());
+                if (pin.getDeporte() != null) jObj.put("nombreDeporte", pin.getDeporte().getNombreDeporte());
             }
             jPartidos.put(jObj);
         }
@@ -518,6 +546,12 @@ public class PersistenciaClubDeportivoJson {
             jObj.put("fecha", se.getFecha());
             jObj.put("hora", se.getHora());
             jObj.put("duracionMinutos", se.getDuracionMinutos());
+            JSONArray jConvocados = new JSONArray();
+            for (Usuarios.Socio convocado : se.getEntrenamientoSocios()) {
+                jConvocados.put(convocado.getIdUsuario());
+            }
+            jObj.put("idSocios", jConvocados);
+            if (se.getInstalacion() != null) jObj.put("nombreInstalacion", se.getInstalacion().getNombre());
             if (se.getEntrenador() != null) jObj.put("idEntrenador", se.getEntrenador().getIdUsuario());
             jSesiones.put(jObj);
         }
@@ -545,6 +579,14 @@ public class PersistenciaClubDeportivoJson {
             jObj.put("idTurno", tur.getIdTurno());
             jObj.put("diaSemana", tur.getDiaSemana());
             jObj.put("esDiurno", tur.isEsDiurno());
+            JSONArray jEmpleados = new JSONArray();
+            for (Usuarios.Entrenador e : tur.getEntrenadores()) {
+                jEmpleados.put(e.getIdUsuario());
+            }
+            for (Usuarios.Fisioterapeuta f : tur.getFisioterapeutas()) {
+                jEmpleados.put(f.getIdUsuario());
+            }
+            jObj.put("idEmpleados", jEmpleados);
             jTurnos.put(jObj);
         }
         raiz.put(TURNOS, jTurnos);

@@ -1,42 +1,132 @@
 {
-    "articulosTienda": [
+  "articulosTienda": [
+    {
+      "nombre": "Raqueta de Tenis Pro",
+      "precioBase": 320000,
+      "cantidadInventario": 8,
+      "categoria": "Tenis"
+    },
+    {
+      "nombre": "Balón de Fútbol N° 5",
+      "precioBase": 85000,
+      "cantidadInventario": 19,
+      "categoria": "Deportes de Equipo"
+    },
+    {
+      "nombre": "Camiseta Séneca",
+      "precioBase": 60000,
+      "cantidadInventario": 2,
+      "categoria": "Ropa"
+    },
+    {
+      "nombre": "Pelotas de Pádel x3",
+      "precioBase": 25000,
+      "cantidadInventario": 15,
+      "categoria": "Pádel"
+    }
+  ],
+  "productosCafeteria": [
+    {
+      "nombre": "Café Americano",
+      "precioBase": 4500,
+      "cantidadInventario": 48,
+      "esBebidaCaliente": true,
+      "alergenos": "Ninguno"
+    },
+    {
+      "nombre": "Jugo de Naranja",
+      "precioBase": 6000,
+      "cantidadInventario": 29,
+      "esBebidaCaliente": false,
+      "alergenos": "Ninguno"
+    },
+    {
+      "nombre": "Sándwich de Jamón y Queso",
+      "precioBase": 12000,
+      "cantidadInventario": 15,
+      "esBebidaCaliente": false,
+      "alergenos": "Lácteos, Gluten"
+    },
+    {
+      "nombre": "Brownie",
+      "precioBase": 7000,
+      "cantidadInventario": 9,
+      "esBebidaCaliente": false,
+      "alergenos": "Gluten, Huevo, Frutos secos"
+    }
+  ],
+  "ventas": [
+    {
+      "idVenta": "V-100",
+      "fecha": "2026-10-19",
+      "hora": 10,
+      "tipo": "Cafeteria",
+      "idUsuario": "7",
+      "items": [
         {
-            "precioBase": 320000,
-            "categoria": "Tenis",
-            "cantidadInventario": 8,
-            "nombre": "Raqueta de Tenis Pro"
+          "nombreProducto": "Café Americano",
+          "cantidad": 2
+        }
+      ],
+      "subTotal": 9000,
+      "descuento": 0,
+      "total": 10620,
+      "puntosGanados": 212
+    },
+    {
+      "idVenta": "V-101",
+      "fecha": "2026-10-20",
+      "hora": 15,
+      "tipo": "TiendaDeportiva",
+      "idUsuario": "8",
+      "items": [
+        {
+          "nombreProducto": "Balón de Fútbol N° 5",
+          "cantidad": 1
+        }
+      ],
+      "subTotal": 85000,
+      "descuento": 0,
+      "total": 101150,
+      "puntosGanados": 2023
+    },
+    {
+      "idVenta": "V-102",
+      "fecha": "2026-10-21",
+      "hora": 11,
+      "tipo": "TiendaDeportiva",
+      "idUsuario": "7",
+      "items": [
+        {
+          "nombreProducto": "Raqueta de Tenis Pro",
+          "cantidad": 1
+        }
+      ],
+      "subTotal": 320000,
+      "descuento": 25600,
+      "total": 350336,
+      "puntosGanados": 7006
+    },
+    {
+      "idVenta": "V-103",
+      "fecha": "2026-10-21",
+      "hora": 9,
+      "tipo": "Cafeteria",
+      "idUsuario": "8",
+      "items": [
+        {
+          "nombreProducto": "Brownie",
+          "cantidad": 1
         },
         {
-            "precioBase": 85000,
-            "categoria": "Deportes de Equipo",
-            "cantidadInventario": 20,
-            "nombre": "Balón de Fútbol N° 5"
+          "nombreProducto": "Jugo de Naranja",
+          "cantidad": 1
         }
-    ],
-    "productosCafeteria": [
-        {
-            "precioBase": 4500,
-            "cantidadInventario": 50,
-            "alergenos": "Ninguno",
-            "nombre": "Café Americano",
-            "esBebidaCaliente": true
-        },
-        {
-            "precioBase": 12000,
-            "cantidadInventario": 15,
-            "alergenos": "Lácteos, Gluten",
-            "nombre": "Sándwich de Jamón y Queso",
-            "esBebidaCaliente": false
-        }
-    ],
-    "ventas": [{
-        "fecha": "2026-10-19",
-        "tipo": "Cafeteria",
-        "hora": 10,
-        "items": [{
-            "cantidad": 2,
-            "nombreProducto": "Café Americano"
-        }],
-        "idVenta": "V-100"
-    }]
+      ],
+      "subTotal": 13000,
+      "descuento": 0,
+      "total": 15340,
+      "puntosGanados": 306
+    }
+  ]
 }

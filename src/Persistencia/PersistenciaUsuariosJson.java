@@ -13,6 +13,8 @@ import Usuarios.Entrenador;
 import Usuarios.Fisioterapeuta;
 import Usuarios.Socio;
 import Usuarios.Usuario;
+import Usuarios.Administrador;
+import Usuarios.Empleado;
 
 public class PersistenciaUsuariosJson {
 
@@ -52,6 +54,8 @@ public class PersistenciaUsuariosJson {
             } else if ("Fisioterapeuta".equalsIgnoreCase(tipo)) {
                 String codigo = jUsuario.optString(CODIGO_DESCUENTO, "");
                 club.crearFisioterapeuta(id, nombre, apellido, login, contrasena, puntos, codigo);
+            } else if ("Administrador".equalsIgnoreCase(tipo)) {
+                club.crearAdministrador(id, nombre, apellido, login, contrasena, puntos);
             }
         }
     }
@@ -77,8 +81,12 @@ public class PersistenciaUsuariosJson {
                     jUsuario.put(ACTIVO, s.isActivo());
                 } else if (usuario instanceof Entrenador) {
                     jUsuario.put(TIPO_USUARIO, "Entrenador");
+                    jUsuario.put(CODIGO_DESCUENTO, ((Empleado) usuario).getCodigoDescuento());
                 } else if (usuario instanceof Fisioterapeuta) {
                     jUsuario.put(TIPO_USUARIO, "Fisioterapeuta");
+                    jUsuario.put(CODIGO_DESCUENTO, ((Empleado) usuario).getCodigoDescuento());
+                } else if (usuario instanceof Administrador) {
+                    jUsuario.put(TIPO_USUARIO, "Administrador");
                 }
 
                 jUsuarios.put(jUsuario);

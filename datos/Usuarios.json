@@ -22,6 +22,7 @@
     "activo": true
   },
   {
+    "codigoDescuento": "COACH15",
     "idUsuario": "3",
     "apellido": "Martínez",
     "contrasena": "coach123",
@@ -31,6 +32,7 @@
     "nombre": "Roberto"
   },
   {
+    "codigoDescuento": "FISIO15",
     "idUsuario": "4",
     "apellido": "Rodríguez",
     "contrasena": "fisio2026",
@@ -38,5 +40,25 @@
     "puntosFidelidad": 20,
     "login": "lrodriguez",
     "nombre": "Laura"
+  },
+  {
+    "idUsuario": "5",
+    "apellido": "Morales",
+    "contrasena": "4321",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "login": "f.morales",
+    "nombre": "Felipe",
+    "edad": 20,
+    "activo": true
+  },
+  {
+    "idUsuario": "6",
+    "apellido": "Sistema",
+    "contrasena": "admin123",
+    "tipoUsuario": "Administrador",
+    "puntosFidelidad": 0,
+    "login": "admin",
+    "nombre": "Administrador"
   }
 ]

@@ -49,7 +49,15 @@ public class Instalacion {
     public Map<String, Boolean> getHorarios() {
         return horarios;
     }
-
+    
+    public boolean esPadelOTenisDeMesaTechada() {
+        if (!esTechado || tipo == null) {
+            return false;
+        }
+        String texto = tipo.toLowerCase();
+        return texto.contains("pádel") || texto.contains("padel") || texto.contains("tenis de mesa");
+    }
+    
     // Getters y Setters
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }

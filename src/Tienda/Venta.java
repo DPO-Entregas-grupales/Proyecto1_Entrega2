@@ -55,56 +55,33 @@ public class Venta {
     
     public void realizarCalculosVentaTiendaDeportiva(List<ItemVenta> itemsVenta, String codigoDescuento, CalculadoraDescuento calculadora) {
         this.subTotal = 0;
-        
-        // Calcula el precio robusto de la lista de items que se pasa.
-        for(ItemVenta item : itemsVenta) {
-            double precioItem = item.precioItemVenta();
-            this.subTotal += (double)precioItem;
+        for (ItemVenta item : itemsVenta) {
+            this.subTotal += item.precioItemVenta();
         }
-        
-        // Calcula cual es el descuento.
-        double descuentoCalculado = calculadora.calcularDescuento(this.usuario, codigoDescuento);
-        this.descuento = descuentoCalculado;
-        
-        // Calcular el subTotal con el descuento
-        if(descuento != 0) {
-            this.subTotal = this.subTotal * descuento;
-        }
-        
-        // Calcula el IVA
-        double totalIVA = this.subTotal * IVA;
-        
-        // Calcular el total de la venta.
-        this.total = this.subTotal + totalIVA;
-
-        // Calcular los puntosGanados.
-        this.puntosGanados = (int) (this.subTotal * PORCENTAJE_PUNTOS);
+        // El descuento se guarda como monto en pesos y se aplica antes del IVA.
+        double porcentaje = calculadora.calcularDescuento(this.usuario, codigoDescuento);
+        this.descuento = this.subTotal * porcentaje;
+        double baseGravable = this.subTotal - this.descuento;
+        double totalIVA = baseGravable * IVA;
+        this.total = baseGravable + totalIVA;
+        this.puntosGanados = (int) (this.total * PORCENTAJE_PUNTOS);
     }
-    
+
     public void realizarCalculosVentaCafeteria(List<ItemVenta> itemsVenta) {
         this.subTotal = 0;
-        
-        // Calcula el precio robusto de la lista de items que se pasa.
-        for(ItemVenta item : itemsVenta) {
-            double precioItem = item.precioItemVenta();
-            this.subTotal += (double)precioItem;
+        for (ItemVenta item : itemsVenta) {
+            this.subTotal += item.precioItemVenta();
         }
-        
-        // Calcula el Impuesto
+        this.descuento = 0;
         double totalImpuesto = this.subTotal * IMPUESTO;
-        
-        // Calcula la propinaSugerida
         double totalPropinaSugerida = this.subTotal * PROPINA_SUGERIDA;
-        
-        // Calcular el total de la venta.
         this.total = this.subTotal + totalPropinaSugerida + totalImpuesto;
-
-        // Calcular los puntosGanados.
-        this.puntosGanados = (int) (this.subTotal * PORCENTAJE_PUNTOS);
+        this.puntosGanados = (int) (this.total * PORCENTAJE_PUNTOS);
     }
-    
+
     public void restarPuntosAlTotal(int puntos) {
-        this.total = this.total - puntos;
+        this.total = Math.max(0, this.total - puntos);
+        this.puntosGanados = (int) (this.total * PORCENTAJE_PUNTOS);
     }
     
     // Getters y Setters

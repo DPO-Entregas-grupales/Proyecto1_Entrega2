@@ -15,7 +15,11 @@ public abstract class Empleado extends Usuario {
 		this.codigoDescuento = codigoDescuento;
 		this.turnos = new HashMap<>();
 	}
-
+	
+	public Map<String, Turno> getTurnos() {
+		return turnos;
+	}
+	
 	public String getCodigoDescuento() {
 		return codigoDescuento;
 	}

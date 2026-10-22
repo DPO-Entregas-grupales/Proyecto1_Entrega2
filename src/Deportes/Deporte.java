@@ -11,6 +11,7 @@ public class Deporte {
 	private int puntosVictoria;
 	private int puntosDerrota;
 	private int puntosEmpate;
+	
 	public Deporte(String nombreDeporte, int minJugadores,List<String> posiciones ,boolean permiteEmpate, int puntosVictoria, int puntosDerrota,
 			int puntosEmpate) {
 		
@@ -19,8 +20,12 @@ public class Deporte {
 		this.permiteEmpate = permiteEmpate;
 		this.puntosVictoria = puntosVictoria;
 		this.puntosDerrota = puntosDerrota;
-		this.puntosEmpate = puntosEmpate;	
-		this.posiciones = new ArrayList <>();
+		this.puntosEmpate = puntosEmpate;
+
+		this.posiciones = new ArrayList<>();
+		if (posiciones != null) {
+			this.posiciones.addAll(posiciones);
+		}
 	}
 	public String getNombreDeporte() {
 		return nombreDeporte;
@@ -63,6 +68,10 @@ public class Deporte {
 	}
 	public void setPuntosEmpate(int puntosEmpate) {
 		this.puntosEmpate = puntosEmpate;
+	}
+	
+	public boolean esIndividual() {
+		return this.minJugadores <= 1;
 	}
 	
 	

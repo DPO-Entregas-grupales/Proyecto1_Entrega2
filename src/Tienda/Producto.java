@@ -28,10 +28,18 @@ public abstract class Producto {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
+	
 	public void agregarProducto(int cantidad) {
-		this.cantidadInventario =+ cantidad;
+		this.cantidadInventario += cantidad;
 	}
+	
 	public void quitarProducto(int cantidad) {
-		this.cantidadInventario =- cantidad;
+		this.cantidadInventario -= cantidad;
+	}
+	
+	public boolean hayDisponibles(int cantidad) {
+		return this.cantidadInventario >= cantidad;
 	}
 }
+	
+

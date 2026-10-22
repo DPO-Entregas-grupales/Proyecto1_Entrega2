@@ -6,7 +6,6 @@ import Usuarios.Empleado;
 import Usuarios.Usuario;
 
 public class CalculadoraDescuento {
-    
     static double DESCUENTO_PARA_EMPLEADOS = 0.15;
     static double DESCUENTO_GENERAL = 0.08;
     private List<String> codigosValidos;
@@ -16,16 +15,23 @@ public class CalculadoraDescuento {
     }
 
     public void agregarCodigoValido(String codigo) {
-        this.codigosValidos.add(codigo);
+        if (codigo != null && !codigo.trim().isEmpty() && !this.codigosValidos.contains(codigo.trim())) {
+            this.codigosValidos.add(codigo.trim());
+        }
     }
 
+    // Devuelve el porcentaje de descuento (0 si no hay código). Lanza IllegalArgumentException si el código no es válido.
     public double calcularDescuento(Usuario usuario, String codigoDescuento) {
-        if (usuario instanceof Empleado && codigosValidos.contains(codigoDescuento)) {
+        if (codigoDescuento == null || codigoDescuento.trim().isEmpty()) {
+            return 0;
+        }
+        String codigo = codigoDescuento.trim();
+        if (!codigosValidos.contains(codigo)) {
+            throw new IllegalArgumentException("El código de descuento no es válido");
+        }
+        if (usuario instanceof Empleado && codigo.equals(((Empleado) usuario).getCodigoDescuento())) {
             return DESCUENTO_PARA_EMPLEADOS;
         }
-        if (codigosValidos.contains(codigoDescuento)) {
-            return DESCUENTO_GENERAL;
-        }
-        return 0;
+        return DESCUENTO_GENERAL;
     }
 }

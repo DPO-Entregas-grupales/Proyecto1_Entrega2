@@ -97,26 +97,34 @@ public class Equipo {
 		}
 	}
 	
-	public boolean esPosicionDisponigle(String posicion) {
-		if(posicion != null && this.deporteEquipo.getPosiciones() != null) {
-			for(String posicionActual: this.deporteEquipo.getPosiciones()) {
-				if(posicionActual.equals(posicion)) {
-					return true;
-				}
+	public boolean esPosicionDisponible(String posicion) {
+		if(posicion == null || posicion.trim().isEmpty()) {
+			return false;
+		}
+		List<String> validas = this.deporteEquipo.getPosiciones();
+		if(validas == null || validas.isEmpty()) {
+			return true;
+		}
+		for(String posicionActual: validas) {
+			if(posicionActual.equalsIgnoreCase(posicion.trim())) {
+				return true;
 			}
 		}
 		return false;
 	}
 	
 	public boolean esCamisetaDisponible(int camiseta) {
-		if(this.getCamisetasDisponibles() != null) {
-			for(int camisetaActual: this.getCamisetasDisponibles()) {
-				if(camisetaActual==camiseta) {
-					return true;
+		if(camiseta <= 0) {
+			return false;
+		}
+		for(Socio socio : this.socios) {
+			for(InscripcionEquipo inscripcion : socio.getInscripcionesEquipos()) {
+				if(inscripcion.getEquipo() == this && inscripcion.getNumeroCamiseta() == camiseta) {
+					return false;
 				}
 			}
 		}
-		return false;
+		return true;
 	}
 	
 	public boolean tieneCupo() {
@@ -129,50 +137,75 @@ public class Equipo {
 		}
 	}
 	
-	public boolean cumpleMinimoJugadores(Equipo equipo) {
-		int sociosActuales = equipo.socios.size();
-		if(sociosActuales >= deporteEquipo.getMinJugadores()) {
-			return true;
+	public InscripcionEquipo getInscripcionDe(Socio socio) {
+		if(socio != null) {
+			for(InscripcionEquipo inscripcion : socio.getInscripcionesEquipos()) {
+				if(inscripcion.getEquipo() == this) {
+					return inscripcion;
+				}
+			}
 		}
-		else {
-			return false;
-		}
+		return null;
 	}
 	
 	public boolean socioPuedeJugar(Socio socio) {
-		
-		int totalAmarillas = 0;
-        int totalRojas = 0;
-        
-		if(socio != null && socio.getEstadisticas() != null) {
-			for(Estadistica estadistica : socio.getEstadisticas()) {
-				if(estadistica instanceof EstadisticaFutbol) {
-					EstadisticaFutbol futbolStats = (EstadisticaFutbol) estadistica;
-					totalAmarillas = futbolStats.getTarjetasAmarillas();
-					totalRojas = futbolStats.getTarjetasRojas();
-				}
-			}
-			return totalAmarillas <3 && totalRojas==0;
+		InscripcionEquipo inscripcion = getInscripcionDe(socio);
+		if(inscripcion == null) {
+			return false;
 		}
-		return true;
+		return !inscripcion.isEstaSuspendido();
+	}
+	
+	public int contarJugadoresHabilitados() {
+		int habilitados = 0;
+		for(Socio socio : this.socios) {
+			if(socio.isActivo() && socioPuedeJugar(socio)) {
+				habilitados++;
+			}
+		}
+		return habilitados;
+	}
+	
+	public boolean cumpleMinimoJugadores() {
+		return contarJugadoresHabilitados() >= this.deporteEquipo.getMinJugadores();
+	}
+	
+	public boolean estaInscritoEn(Competencia competencia) {
+		for(InscripcionCompetencia inscripcion : this.inscripcionesCompetencia) {
+			if(inscripcion.getCompetencia() == competencia) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public String motivoNoPuedeInscribirseEnCompetencia(Competencia competencia, List<Socio> nominaJugadores) {
+		if(competencia == null) {
+			return "La competencia no existe";
+		}
+		if(estaInscritoEn(competencia)) {
+			return "El equipo ya está inscrito en la competencia";
+		}
+		if(competencia.getCategoria() != this.categoriaEdad) {
+			return "La categoría del equipo no corresponde a la de la competencia";
+		}
+		int minimo = this.deporteEquipo.getMinJugadores();
+		if(nominaJugadores == null || nominaJugadores.size() < minimo) {
+			return "La nómina no alcanza el mínimo de jugadores (" + minimo + ")";
+		}
+		for(Socio socio : nominaJugadores) {
+			if(!this.socios.contains(socio)) {
+				return "El socio " + socio.getIdUsuario() + " no pertenece al equipo";
+			}
+			if(!socioPuedeJugar(socio)) {
+				return "El socio " + socio.getIdUsuario() + " esta suspendido y no puede estar en la nomina";
+			}
+		}
+		return null;
 	}
 	
 	public boolean sePuedeCrearInscripcionCompetencia(Competencia competencia, List<Socio> nominaJugadores) {
-		if(this.inscripcionesCompetencia != null) {
-			for(InscripcionCompetencia competenciaActual: this.inscripcionesCompetencia) {
-				if(competenciaActual.getCompetencia().equals(competencia)) {
-					return false;
-				}
-			}
-			int minimoJugadores = this.getDeporteEquipo().getMinJugadores();
-			if(nominaJugadores == null || nominaJugadores.size() < minimoJugadores) {
-				return false;
-			}
-			if(competencia.getCategoria()!=this.getCategoriaEdad()) {
-				return false;
-			}
-		}
-		return true;
+		return motivoNoPuedeInscribirseEnCompetencia(competencia, nominaJugadores) == null;
 	}
 	
 	public boolean sePuedeCrearPartidoCompetencia(Competencia competencia, List<Socio> nominaJugadores){
@@ -185,15 +218,34 @@ public class Equipo {
 		}
 		return true;
 	}
-	public boolean sePuedeCrearPartidoInterno(Equipo equipo2) {
-		if(equipo2 !=null) {
-			if(this.getCategoriaEdad() != equipo2.getCategoriaEdad()) {
-				return false;
-			}
-			if(this.getDeporteEquipo() != equipo2.getDeporteEquipo()) {
-				return false;
-			}
+	
+	
+	public String motivoNoPuedeJugarContra(Equipo equipo2) {
+		if(equipo2 == null) {
+			return "El equipo rival no existe";
 		}
-		return true;
+		if(equipo2 == this) {
+			return "Los equipos deben ser distintos";
+		}
+		if(this.categoriaEdad != equipo2.getCategoriaEdad()) {
+			return "Los equipos deben ser de la misma categoría";
+		}
+		if(this.deporteEquipo != equipo2.getDeporteEquipo()) {
+			return "Los equipos deben ser del mismo deporte";
+		}
+		if(!this.cumpleMinimoJugadores()) {
+			return "El equipo " + this.nombreEquipo + " no tiene el mínimo de jugadores habilitados (habilitados: "
+					+ contarJugadoresHabilitados() + ", mínimo: " + this.deporteEquipo.getMinJugadores() + ")";
+		}
+		if(!equipo2.cumpleMinimoJugadores()) {
+			return "El equipo " + equipo2.getNombreEquipo() + " no tiene el mínimo de jugadores habilitados (habilitados: "
+					+ equipo2.contarJugadoresHabilitados() + ", mínimo: " + equipo2.getDeporteEquipo().getMinJugadores() + ")";
+		}
+		return null;
+	}
+	
+	public boolean sePuedeCrearPartidoInterno(Equipo equipo2) {
+		return motivoNoPuedeJugarContra(equipo2) == null;
 	}
 }
+

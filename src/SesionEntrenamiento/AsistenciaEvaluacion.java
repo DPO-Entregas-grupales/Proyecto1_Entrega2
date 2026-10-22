@@ -32,5 +32,9 @@ public class AsistenciaEvaluacion {
 		return sesionEntrenamiento;
 	}
 	
+	public static boolean esNotaValida(double nota) {
+		return nota == 0 || (nota >= 1 && nota <= 5);
+	}
+	
 	
 }

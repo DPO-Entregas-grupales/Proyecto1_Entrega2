@@ -110,6 +110,11 @@ public class PersistenciaTiendaJson {
 
             // Invoca crearVenta para reconstituir el registro sin recalcular ni alterar inventarios
             tienda.crearVenta(idVenta, fecha, hora, idUsuario, "", items, club, tipo);
+            Venta cargada = tienda.getVentas().get(tienda.getVentas().size() - 1);
+            cargada.setSubTotal(jVenta.optDouble("subTotal", 0));
+            cargada.setDescuento(jVenta.optDouble("descuento", 0));
+            cargada.setTotal(jVenta.optDouble("total", 0));
+            cargada.setPuntosGanados(jVenta.optInt("puntosGanados", 0));
         }
     }
 
@@ -163,6 +168,11 @@ public class PersistenciaTiendaJson {
             jVenta.put("fecha", venta.getFecha());
             jVenta.put("hora", venta.getHora());
             jVenta.put("tipo", venta.getTipo());
+            
+            jVenta.put("subTotal", venta.getSubTotal());
+            jVenta.put("descuento", venta.getDescuento());
+            jVenta.put("total", venta.getTotal());
+            jVenta.put("puntosGanados", venta.getPuntosGanados());
             
             if (venta.getUsuario() != null) {
                 jVenta.put("idUsuario", venta.getUsuario().getIdUsuario());

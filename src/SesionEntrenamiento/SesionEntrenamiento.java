@@ -7,6 +7,7 @@ import java.util.List;
 import Usuarios.Socio;
 import Usuarios.Entrenador;
 import Deportes.Equipo;
+import ReservasInstalaciones.Instalacion;
 
 public class SesionEntrenamiento {
 	private String idEntrenamiento;
@@ -16,6 +17,7 @@ public class SesionEntrenamiento {
 	private Entrenador entrenador;
 	private Map<String, AsistenciaEvaluacion> asistenciaEvaluaciones;
 	private List<Socio> entrenamientoSocios;
+	private Instalacion instalacion;
 	
 	public SesionEntrenamiento(String idEntrenamiento, String fecha, String hora, int duracionMinutos,
 			Entrenador entrenador) {
@@ -26,6 +28,14 @@ public class SesionEntrenamiento {
 		this.entrenador = entrenador;
 		this.asistenciaEvaluaciones = new HashMap<>();
 		this.entrenamientoSocios = new ArrayList<>();
+	}
+	
+	public Instalacion getInstalacion() {
+		return instalacion;
+	}
+	
+	public void setInstalacion(Instalacion instalacion) {
+		this.instalacion = instalacion;
 	}
 	
 	public String getIdEntrenamiento() {
@@ -107,7 +117,7 @@ public class SesionEntrenamiento {
 		if(equipo != null) {
 			if(equipo.getSocios() != null) {
 				for(Socio socio: equipo.getSocios()) {
-					if(socio != null && this.entrenamientoSocios.contains(socio)){
+					if(socio != null && !this.entrenamientoSocios.contains(socio)){
 						this.entrenamientoSocios.add(socio);
 					}
 				}

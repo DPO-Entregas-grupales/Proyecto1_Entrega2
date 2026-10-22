@@ -8,6 +8,7 @@ import java.util.Map;
 import Deportes.Deporte;
 import Deportes.InscripcionEquipo;
 import Deportes.InscripcionIndividual;
+import Deportes.Equipo;
 import ReservasInstalaciones.Reserva;
 import SesionEntrenamiento.AsistenciaEvaluacion;
 import Estadisticas.Estadistica;
@@ -35,6 +36,15 @@ public class Socio extends Usuario {
 		this.reservas = new HashMap<>();
 		this.asistenciaEvaluaciones = new ArrayList<>();
 		this.estadisticas = new ArrayList<>();
+	}
+	
+	public boolean tieneReservaActiva() {
+		for(Reserva reserva : this.reservas.values()) {
+			if(reserva.estaActiva() && reserva.getInstalacion().esPadelOTenisDeMesaTechada()) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public int getEdad() {
@@ -104,12 +114,37 @@ public class Socio extends Usuario {
 	
 	public boolean esDeporteNoInscrito(Deporte deporte) {
 		if(deporte != null && this.getInscripcionesEquipos()!=null) {
-			for(InscripcionEquipo equipo : this.getInscripcionesEquipos()) {
-				if(equipo.getEquipo() !=null && deporte.equals(equipo.getEquipo())) {
+			for(InscripcionEquipo inscripcion : this.getInscripcionesEquipos()) {
+				if(inscripcion.getEquipo() != null && deporte.equals(inscripcion.getEquipo().getDeporteEquipo())) {
 					return false;
 				}
 			}
 		}
 		return true;
 	}
+	
+	// Devuelve el motivo por el que el socio no puede inscribirse al equipo, o null si si se puede.
+	public String motivoNoPuedeInscribirse(Equipo equipo) {
+		if(equipo == null) {
+			return "El equipo no existe";
+		}
+		if(!this.activo) {
+			return "El socio está inactivo";
+		}
+		if(!esDeporteNoInscrito(equipo.getDeporteEquipo())) {
+			return "El socio ya pertenece a un equipo de ese deporte";
+		}
+		if(this.edad > equipo.getCategoriaEdad()) {
+			return "La edad del socio no corresponde a la categoría del equipo";
+		}
+		if(!equipo.tieneCupo()) {
+			return "El equipo no tiene cupo";
+		}
+		return null;
+	}
+	
+	public boolean sePuedeCrearInscripcionEquipo(Equipo equipo) {
+		return motivoNoPuedeInscribirse(equipo) == null;
+	}
 }
+
