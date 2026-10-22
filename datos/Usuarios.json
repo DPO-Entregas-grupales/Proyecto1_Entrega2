@@ -1,6 +1,263 @@
 [
   {
+    "idUsuario": "22",
+    "apellido": "León",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "login": "leon7",
+    "nombre": "Jugador7",
+    "edad": 26,
+    "activo": true
+  },
+  {
+    "idUsuario": "23",
+    "apellido": "Águila",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "login": "aguila1",
+    "nombre": "Jugador1",
+    "edad": 20,
+    "activo": true
+  },
+  {
+    "idUsuario": "24",
+    "apellido": "Águila",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "login": "aguila2",
+    "nombre": "Jugador2",
+    "edad": 21,
+    "activo": true
+  },
+  {
+    "idUsuario": "25",
+    "apellido": "Águila",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "login": "aguila3",
+    "nombre": "Jugador3",
+    "edad": 22,
+    "activo": true
+  },
+  {
+    "idUsuario": "26",
+    "apellido": "Águila",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "login": "aguila4",
+    "nombre": "Jugador4",
+    "edad": 23,
+    "activo": true
+  },
+  {
+    "idUsuario": "27",
+    "apellido": "Águila",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "login": "aguila5",
+    "nombre": "Jugador5",
+    "edad": 24,
+    "activo": true
+  },
+  {
+    "idUsuario": "28",
+    "apellido": "Águila",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "login": "aguila6",
+    "nombre": "Jugador6",
+    "edad": 25,
+    "activo": true
+  },
+  {
+    "idUsuario": "29",
+    "apellido": "Águila",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "login": "aguila7",
+    "nombre": "Jugador7",
+    "edad": 26,
+    "activo": true
+  },
+  {
+    "idUsuario": "10",
+    "apellido": "Ruiz",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "login": "sruiz",
+    "nombre": "Sofía",
+    "edad": 12,
+    "activo": true
+  },
+  {
+    "idUsuario": "11",
+    "apellido": "León",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "login": "mleon",
+    "nombre": "Mateo",
+    "edad": 14,
+    "activo": true
+  },
+  {
+    "idUsuario": "12",
+    "apellido": "Vega",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "login": "lvega",
+    "nombre": "Luis",
+    "edad": 22,
+    "activo": true
+  },
+  {
+    "idUsuario": "13",
+    "apellido": "Ortiz",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "login": "mortiz",
+    "nombre": "Marta",
+    "edad": 25,
+    "activo": true
+  },
+  {
+    "idUsuario": "14",
+    "apellido": "Soto",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "login": "dsoto",
+    "nombre": "Diego",
+    "edad": 21,
+    "activo": true
+  },
+  {
+    "idUsuario": "15",
+    "apellido": "Prada",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "login": "jprada",
+    "nombre": "Juana",
+    "edad": 30,
+    "activo": false
+  },
+  {
+    "idUsuario": "16",
+    "apellido": "León",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "login": "leon1",
+    "nombre": "Jugador1",
+    "edad": 20,
+    "activo": true
+  },
+  {
+    "idUsuario": "17",
+    "apellido": "León",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "login": "leon2",
+    "nombre": "Jugador2",
+    "edad": 21,
+    "activo": true
+  },
+  {
+    "idUsuario": "18",
+    "apellido": "León",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "login": "leon3",
+    "nombre": "Jugador3",
+    "edad": 22,
+    "activo": true
+  },
+  {
+    "idUsuario": "19",
+    "apellido": "León",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "login": "leon4",
+    "nombre": "Jugador4",
+    "edad": 23,
+    "activo": true
+  },
+  {
     "idUsuario": "1",
+    "apellido": "Sistema",
+    "contrasena": "admin123",
+    "tipoUsuario": "Administrador",
+    "puntosFidelidad": 0,
+    "login": "admin",
+    "nombre": "Administrador"
+  },
+  {
+    "codigoDescuento": "COACH15",
+    "idUsuario": "2",
+    "apellido": "Martínez",
+    "contrasena": "coach123",
+    "tipoUsuario": "Entrenador",
+    "puntosFidelidad": 50,
+    "login": "rmartinez",
+    "nombre": "Roberto"
+  },
+  {
+    "codigoDescuento": "CAMI15",
+    "idUsuario": "3",
+    "apellido": "Torres",
+    "contrasena": "coach456",
+    "tipoUsuario": "Entrenador",
+    "puntosFidelidad": 0,
+    "login": "ctorres",
+    "nombre": "Camila"
+  },
+  {
+    "codigoDescuento": "ANDRES15",
+    "idUsuario": "4",
+    "apellido": "Ruiz",
+    "contrasena": "coach789",
+    "tipoUsuario": "Entrenador",
+    "puntosFidelidad": 0,
+    "login": "aruiz",
+    "nombre": "Andrés"
+  },
+  {
+    "codigoDescuento": "FISIO15",
+    "idUsuario": "5",
+    "apellido": "Rodríguez",
+    "contrasena": "fisio2026",
+    "tipoUsuario": "Fisioterapeuta",
+    "puntosFidelidad": 20,
+    "login": "lrodriguez",
+    "nombre": "Laura"
+  },
+  {
+    "codigoDescuento": "PABLO15",
+    "idUsuario": "6",
+    "apellido": "Díaz",
+    "contrasena": "fisio2027",
+    "tipoUsuario": "Fisioterapeuta",
+    "puntosFidelidad": 0,
+    "login": "pdiaz",
+    "nombre": "Pablo"
+  },
+  {
+    "idUsuario": "7",
     "apellido": "Pérez",
     "contrasena": "1234",
     "tipoUsuario": "Socio",
@@ -11,7 +268,7 @@
     "activo": true
   },
   {
-    "idUsuario": "2",
+    "idUsuario": "8",
     "apellido": "Gómez",
     "contrasena": "abcd",
     "tipoUsuario": "Socio",
@@ -22,43 +279,36 @@
     "activo": true
   },
   {
-    "codigoDescuento": "COACH15",
-    "idUsuario": "3",
-    "apellido": "Martínez",
-    "contrasena": "coach123",
-    "tipoUsuario": "Entrenador",
-    "puntosFidelidad": 50,
-    "login": "rmartinez",
-    "nombre": "Roberto"
-  },
-  {
-    "codigoDescuento": "FISIO15",
-    "idUsuario": "4",
-    "apellido": "Rodríguez",
-    "contrasena": "fisio2026",
-    "tipoUsuario": "Fisioterapeuta",
-    "puntosFidelidad": 20,
-    "login": "lrodriguez",
-    "nombre": "Laura"
-  },
-  {
-    "idUsuario": "5",
+    "idUsuario": "9",
     "apellido": "Morales",
     "contrasena": "4321",
     "tipoUsuario": "Socio",
     "puntosFidelidad": 0,
-    "login": "f.morales",
+    "login": "fmorales",
     "nombre": "Felipe",
     "edad": 20,
     "activo": true
   },
   {
-    "idUsuario": "6",
-    "apellido": "Sistema",
-    "contrasena": "admin123",
-    "tipoUsuario": "Administrador",
+    "idUsuario": "20",
+    "apellido": "León",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
     "puntosFidelidad": 0,
-    "login": "admin",
-    "nombre": "Administrador"
+    "login": "leon5",
+    "nombre": "Jugador5",
+    "edad": 24,
+    "activo": true
+  },
+  {
+    "idUsuario": "21",
+    "apellido": "León",
+    "contrasena": "pw",
+    "tipoUsuario": "Socio",
+    "puntosFidelidad": 0,
+    "login": "leon6",
+    "nombre": "Jugador6",
+    "edad": 25,
+    "activo": true
   }
 ]
