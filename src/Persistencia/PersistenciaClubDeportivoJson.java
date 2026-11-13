@@ -13,7 +13,6 @@ import org.json.JSONObject;
 
 import Modelo.ClubDeportivoSeneca;
 import Usuarios.Entrenador;
-import Usuarios.Socio;
 import Deportes.Deporte;
 import Deportes.Equipo;
 import Deportes.Competencia;

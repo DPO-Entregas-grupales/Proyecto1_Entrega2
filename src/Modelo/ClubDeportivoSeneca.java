@@ -1,7 +1,9 @@
 package Modelo;
 
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +25,9 @@ import Partidos.Partido;
 import Partidos.PartidoCompetencia;
 import Partidos.PartidoIndividual;
 import Partidos.PartidoInterno;
+import Partidos.Torneo;
+import Partidos.TorneoConjunto;
+import Partidos.TorneoIndividual;
 import SesionEntrenamiento.SesionEntrenamiento;
 import SesionEntrenamiento.AsistenciaEvaluacion;
 import Turnos.Turno;
@@ -45,6 +50,7 @@ public class ClubDeportivoSeneca {
     private Map<String, Instalacion> instalaciones;
     private Map<String, Reserva> reservas;
     private Map<String, Partido> partidos;
+    private Map<String, Torneo> torneos;
     private Map<String, SesionEntrenamiento> sesionesEntrenamiento;
     private List<AsistenciaEvaluacion> asistenciaEvaluaciones;
     private Map<String, Turno> turnos;
@@ -62,6 +68,7 @@ public class ClubDeportivoSeneca {
         this.instalaciones = new HashMap<>();
         this.reservas = new HashMap<>();
         this.partidos = new HashMap<>();
+        this.torneos = new HashMap<>();
         this.sesionesEntrenamiento = new HashMap<>();
         this.asistenciaEvaluaciones = new ArrayList<>();
         this.turnos = new HashMap<>();
@@ -129,6 +136,12 @@ public class ClubDeportivoSeneca {
         }
     }
 
+    public void agregarTorneo(Torneo torneo) {
+        if (torneo != null && torneo.getIdTorneo() != null) {
+            torneos.put(torneo.getIdTorneo(), torneo);
+        }
+    }
+
     public void agregarSesionEntrenamiento(SesionEntrenamiento sesionEntrenamiento) {
         if (sesionEntrenamiento != null && sesionEntrenamiento.getIdEntrenamiento() != null) {
             sesionesEntrenamiento.put(sesionEntrenamiento.getIdEntrenamiento(), sesionEntrenamiento);
@@ -174,7 +187,7 @@ public class ClubDeportivoSeneca {
         Fisioterapeuta fisio = new Fisioterapeuta(idUsuario, nombre, apellido, login, contrasena, puntosFidelidad, codigoDescuento);
         agregarUsuario(fisio);
     }
-    
+
     public void crearAdministrador(String idUsuario, String nombre, String apellido, String login, String contrasena, int puntosFidelidad) {
         Administrador admin = new Administrador(idUsuario, nombre, apellido, login, contrasena, puntosFidelidad);
         agregarUsuario(admin);
@@ -220,8 +233,8 @@ public class ClubDeportivoSeneca {
             equipo.agregarSocio(socio);
         }
     }
-    
-    // Operación del socio: valida las reglas y lanza exepcion con el motivo si no se cumple alguna regla.
+
+    // Operación del socio: valida las reglas y lanza excepcion con el motivo si no se cumple alguna regla.
     public void realizarInscripcionEquipo(String idSocio, String nombreEquipo, String posicion, int numeroCamiseta) {
         Usuario usuario = usuarios.get(idSocio);
         if (!(usuario instanceof Socio)) {
@@ -240,7 +253,7 @@ public class ClubDeportivoSeneca {
         }
         crearInscripcionEquipo(idSocio, nombreEquipo, posicion, numeroCamiseta, 0);
     }
-    
+
     public void crearInscripcionCompetencia(int puntosAcumulados, String posicion, String nombreEquipo, String nombreCompetencia) {
         Equipo equipo = equipos.get(nombreEquipo);
         Competencia competencia = competencias.get(nombreCompetencia);
@@ -251,7 +264,7 @@ public class ClubDeportivoSeneca {
             equipo.agregarInscripcionCompetencia(inscripcion);
         }
     }
-    
+
     public void realizarInscripcionCompetencia(int puntosAcumulados, String posicion, String nombreEquipo, String nombreCompetencia, List<Socio> nominaJugadores) {
         Equipo equipo = equipos.get(nombreEquipo);
         Competencia competencia = competencias.get(nombreCompetencia);
@@ -319,9 +332,9 @@ public class ClubDeportivoSeneca {
     public void crearPartidoIndividual(String idPartido, String fecha, String marcadorFinal, String estadoPartido, String idUsuario1, String idUsuario2, String nombreDeporte) {
         Usuario u1 = usuarios.get(idUsuario1);
         Usuario u2 = usuarios.get(idUsuario2);
-        if (u1 instanceof Socio && u2 instanceof Socio) {
+        if (u1 != null && u2 != null) {
             Deporte deporte = deportes.get(nombreDeporte);
-            PartidoIndividual partido = new PartidoIndividual(idPartido, fecha, marcadorFinal, estadoPartido, deporte, (Socio) u1, (Socio) u2);
+            PartidoIndividual partido = new PartidoIndividual(idPartido, fecha, marcadorFinal, estadoPartido, deporte, u1, u2);
             agregarPartido(partido);
         }
     }
@@ -517,8 +530,7 @@ public class ClubDeportivoSeneca {
         }
     }
 
-    //DEPORTES INDIVIDUALES
-
+    // DEPORTES INDIVIDUALES
     private InscripcionIndividual buscarInscripcionIndividual(Socio socio, Deporte deporte) {
         for (InscripcionIndividual inscripcion : inscripcionesIndividual) {
             if (inscripcion.getSocio() == socio && inscripcion.getDeporteIndividual() == deporte) {
@@ -661,8 +673,8 @@ public class ClubDeportivoSeneca {
         }
         crearEstadisticaRaqueta(generarIdEstadistica(), idSocio, idPartido, setGanados, gamesGanados, aces, errores, puntosTotales);
     }
-    
-    //ADMIN Encargdo
+
+    // ADMIN Encargado
     private String describirPartido(Partido partido) {
         String detalle = "Partido";
         if (partido instanceof PartidoInterno) {
@@ -673,7 +685,12 @@ public class ClubDeportivoSeneca {
             detalle = "Competencia: " + competencia.getEquipo().getNombreEquipo() + " vs " + competencia.getInstitucionRival();
         } else if (partido instanceof PartidoIndividual) {
             PartidoIndividual individual = (PartidoIndividual) partido;
-            detalle = "Individual: " + individual.getSocio1().getNombre() + " vs " + individual.getSocio2().getNombre();
+            Usuario j1 = individual.getJugador1() != null ? individual.getJugador1() : individual.getSocio1();
+            Usuario j2 = individual.getJugador2() != null ? individual.getJugador2()
+                    : (individual.getSocio2() != null ? individual.getSocio2() : individual.getEntrenador());
+            String n1 = j1 != null ? j1.getNombre() : "";
+            String n2 = j2 != null ? j2.getNombre() : "";
+            detalle = "Individual: " + n1 + " vs " + n2;
         }
         return partido.getIdPartido() + " / " + detalle + " / " + partido.getFecha() + " / " + partido.getEstadoPartido()
                 + " / marcador: " + partido.getMarcadorFinal();
@@ -854,7 +871,7 @@ public class ClubDeportivoSeneca {
         return lineas;
     }
 
-    // Baja de un equip - se rechaza si tiene partidos programados; se eliminan sus inscripciones
+    // Baja de un equipo - se rechaza si tiene partidos programados; se eliminan sus inscripciones
     public void realizarBajaEquipo(String nombreEquipo) {
         Equipo equipo = equipos.get(nombreEquipo);
         if (equipo == null) {
@@ -878,7 +895,7 @@ public class ClubDeportivoSeneca {
         darDeBajaEquipo(equipo);
     }
 
-    // Baja de un jugador - queda inactivo (no puede iniciar sesión ni cuenta como habilitado
+    // Baja de un jugador - queda inactivo (no puede iniciar sesión ni cuenta como habilitado)
     public void realizarBajaJugador(String idSocio) {
         Usuario usuario = usuarios.get(idSocio);
         if (!(usuario instanceof Socio)) {
@@ -890,8 +907,8 @@ public class ClubDeportivoSeneca {
         }
         darDeBajaJugador(socio);
     }
-    
-    //ESTADISTICAS
+
+    // ESTADISTICAS
     public String generarIdEstadistica() {
         int max = 0;
         for (Estadistica estadistica : estadisticas) {
@@ -923,7 +940,7 @@ public class ClubDeportivoSeneca {
         validarParticipante(idPartido, idSocio);
         crearEstadisticaVoleibol(generarIdEstadistica(), idSocio, idPartido, aces, bloqueos);
     }
-    
+
     public void crearSesionEntrenamiento(String idEntrenamiento, String fecha, String hora, int duracionMinutos, Entrenador entrenador) {
         SesionEntrenamiento sesion = new SesionEntrenamiento(idEntrenamiento, fecha, hora, duracionMinutos, entrenador);
         agregarSesionEntrenamiento(sesion);
@@ -1016,8 +1033,7 @@ public class ClubDeportivoSeneca {
         agregarSolicitudCambioTurno(solicitud);
     }
 
-    //RESERVAS Y ENTRENAMIENTOS
-
+    // RESERVAS Y ENTRENAMIENTOS
     public void realizarReserva(String idReserva, String idSocio, String nombreInstalacion, String fecha, String hora, int cantidadJugadores, String modalidad) {
         Usuario usuario = usuarios.get(idSocio);
         if (!(usuario instanceof Socio)) {
@@ -1148,7 +1164,7 @@ public class ClubDeportivoSeneca {
         }
         crearAsistenciaEvaluacion(estadoAsistencia, nota, comentario, idSocio, idEntrenamiento);
     }
-    
+
     // ESTADÍSTICAS
     public void crearEstadisticaFutbol(String idEstadistica, String idSocio, String idPartido, int goles, int asistencias, int tarjetasAmarillas, int tarjetasRojas) {
         Socio socio = (Socio) usuarios.get(idSocio);
@@ -1195,7 +1211,6 @@ public class ClubDeportivoSeneca {
     }
 
     // REQUISITOS FUNCIONALES
-    // Goles acumulados de un socio en los partidos de una competencia.
     public int golesEnCompetencia(String nombreCompetencia, Socio socio) {
         Competencia competencia = competencias.get(nombreCompetencia);
         int total = 0;
@@ -1239,7 +1254,426 @@ public class ClubDeportivoSeneca {
             socio.setActivo(false);
         }
     }
- // PERSISTENCIA
+
+    // =========================================================================
+    // TORNEOS INTERNOS RECREATIVOS (HU-01, HU-02, HU-03, HU-04, HU-05, HU-07, HU-08)
+    // =========================================================================
+
+    // HU-01 CA-1 y CA-2: Crear torneo interno recreativo de conjunto
+    public TorneoConjunto crearTorneoConjunto(String idAdministrador, String idTorneo, String nombreTorneo,
+                                                String nombreDeporte, int categoria, int cuposTotales) {
+        Usuario admin = usuarios.get(idAdministrador);
+        if (!(admin instanceof Administrador)) {
+            throw new IllegalArgumentException("Solo un administrador puede crear torneos internos");
+        }
+        Deporte deporte = deportes.get(nombreDeporte);
+        if (deporte == null) {
+            throw new IllegalArgumentException("El deporte seleccionado no está disponible en el club");
+        }
+        if (deporte.esIndividual()) {
+            throw new IllegalArgumentException("El deporte seleccionado no es un deporte de conjunto");
+        }
+        if (torneos.containsKey(idTorneo)) {
+            throw new IllegalArgumentException("Ya existe un torneo con ese identificador");
+        }
+        TorneoConjunto torneo = new TorneoConjunto(idTorneo, nombreTorneo, deporte, categoria, cuposTotales);
+        agregarTorneo(torneo);
+        return torneo;
+    }
+
+    // Crear torneo interno recreativo individual
+    public TorneoIndividual crearTorneoIndividual(String idAdministrador, String idTorneo, String nombreTorneo,
+                                                    String nombreDeporte, int categoria, int cuposTotales) {
+        Usuario admin = usuarios.get(idAdministrador);
+        if (!(admin instanceof Administrador)) {
+            throw new IllegalArgumentException("Solo un administrador puede crear torneos internos");
+        }
+        Deporte deporte = deportes.get(nombreDeporte);
+        if (deporte == null) {
+            throw new IllegalArgumentException("El deporte seleccionado no está disponible en el club");
+        }
+        if (!deporte.esIndividual()) {
+            throw new IllegalArgumentException("El deporte seleccionado no es una disciplina individual");
+        }
+        if (torneos.containsKey(idTorneo)) {
+            throw new IllegalArgumentException("Ya existe un torneo con ese identificador");
+        }
+        TorneoIndividual torneo = new TorneoIndividual(idTorneo, nombreTorneo, deporte, categoria, cuposTotales);
+        agregarTorneo(torneo);
+        return torneo;
+    }
+
+    // HU-02 CA-1, CA-2 y CA-3: Finalizar un torneo ('En curso' -> 'Finalizado') y otorgar bonos si aplica
+    public void finalizarTorneo(String idAdministrador, String idTorneo, Tienda tienda) {
+        Usuario admin = usuarios.get(idAdministrador);
+        if (!(admin instanceof Administrador)) {
+            throw new IllegalArgumentException("Solo un administrador puede administrar torneos");
+        }
+        Torneo torneo = torneos.get(idTorneo);
+        if (torneo == null) {
+            throw new IllegalArgumentException("El torneo no existe");
+        }
+        if (Torneo.FINALIZADO.equalsIgnoreCase(torneo.getEstado())) {
+            throw new IllegalArgumentException("El torneo ya ha finalizado");
+        }
+        if (!Torneo.EN_CURSO.equalsIgnoreCase(torneo.getEstado())) {
+            throw new IllegalArgumentException("El torneo no se encuentra en curso");
+        }
+
+        torneo.setEstado(Torneo.FINALIZADO);
+        String primerLugar = torneo.obtenerPrimerLugar();
+        if (primerLugar == null) {
+            return;
+        }
+
+        if (torneo instanceof TorneoConjunto) {
+            Equipo equipoGanador = equipos.get(primerLugar);
+            if (equipoGanador != null) {
+                for (Socio jugador : equipoGanador.getSocios()) {
+                    String codigoBono = "BONO-" + torneo.getIdTorneo() + "-" + jugador.getIdUsuario();
+                    jugador.agregarBonoDescuento(codigoBono);
+                    if (tienda != null) {
+                        tienda.registrarBonoTorneo(codigoBono);
+                    }
+                }
+            }
+        } else if (torneo instanceof TorneoIndividual) {
+            Usuario ganador = usuarios.get(primerLugar);
+            if (ganador instanceof Socio) {
+                String codigoBono = "BONO-" + torneo.getIdTorneo() + "-" + ganador.getIdUsuario();
+                ((Socio) ganador).agregarBonoDescuento(codigoBono);
+                if (tienda != null) {
+                    tienda.registrarBonoTorneo(codigoBono);
+                }
+            }
+        }
+    }
+
+    // Determina si el socio está en el top 20% mejor rankeado de su disciplina individual
+    public boolean esSocioMejorRankeado(Socio socio, Deporte deporte, int categoria) {
+        List<InscripcionIndividual> elegibles = new ArrayList<>();
+        for (InscripcionIndividual insc : inscripcionesIndividual) {
+            if (insc.getDeporteIndividual() == deporte && insc.getSocio().isActivo()) {
+                if (categoria <= 0 || insc.getSocio().getEdad() <= categoria) {
+                    elegibles.add(insc);
+                }
+            }
+        }
+        elegibles.sort((a, b) -> Double.compare(b.getPuntajeRanking(), a.getPuntajeRanking()));
+
+        InscripcionIndividual inscSocio = buscarInscripcionIndividual(socio, deporte);
+        if (inscSocio == null || inscSocio.getPuntajeRanking() <= 0 || elegibles.isEmpty()) {
+            return false;
+        }
+        int cantidadTop = Math.max(1, (int) Math.ceil(elegibles.size() * 0.20));
+        for (int i = 0; i < Math.min(cantidadTop, elegibles.size()); i++) {
+            if (elegibles.get(i).getSocio() == socio) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // HU-03 CA-1 a CA-5: Inscripción de un socio a un torneo individual
+    public void inscribirSocioTorneoIndividual(String idSocio, String idTorneo) {
+        Usuario u = usuarios.get(idSocio);
+        if (!(u instanceof Socio)) {
+            throw new IllegalArgumentException("El socio no existe");
+        }
+        Socio socio = (Socio) u;
+        Torneo t = torneos.get(idTorneo);
+        if (!(t instanceof TorneoIndividual)) {
+            throw new IllegalArgumentException("El torneo individual no existe");
+        }
+        TorneoIndividual torneo = (TorneoIndividual) t;
+
+        if (!Torneo.EN_CURSO.equalsIgnoreCase(torneo.getEstado())) {
+            throw new IllegalArgumentException("El torneo ya ha finalizado");
+        }
+        if (torneo.estaParticipanteInscrito(socio)) {
+            throw new IllegalArgumentException("El socio ya se encuentra inscrito en el torneo");
+        }
+        InscripcionIndividual inscripcionDisciplina = buscarInscripcionIndividual(socio, torneo.getDeporte());
+        if (inscripcionDisciplina == null) {
+            throw new IllegalArgumentException("El socio no está registrado en la disciplina del torneo");
+        }
+        if (torneo.getCategoria() > 0 && socio.getEdad() > torneo.getCategoria()) {
+            throw new IllegalArgumentException("El socio no cumple con la categoría del torneo");
+        }
+
+        boolean mejorRankeado = esSocioMejorRankeado(socio, torneo.getDeporte(), torneo.getCategoria());
+        if (mejorRankeado && torneo.getCuposPreferenciales() > 0) {
+            torneo.inscribirParticipante(socio, true);
+        } else if (torneo.getCuposGenerales() > 0) {
+            torneo.inscribirParticipante(socio, false);
+        } else {
+            throw new IllegalArgumentException("No hay cupos generales disponibles");
+        }
+    }
+
+    // HU-04 CA-1 y CA-2: Desinscripción de un socio de un torneo individual
+    public void desinscribirSocioTorneoIndividual(String idSocio, String idTorneo) {
+        Usuario u = usuarios.get(idSocio);
+        if (!(u instanceof Socio)) {
+            throw new IllegalArgumentException("El socio no existe");
+        }
+        Socio socio = (Socio) u;
+        Torneo t = torneos.get(idTorneo);
+        if (!(t instanceof TorneoIndividual)) {
+            throw new IllegalArgumentException("El torneo individual no existe");
+        }
+        TorneoIndividual torneo = (TorneoIndividual) t;
+
+        if (!torneo.estaParticipanteInscrito(socio)) {
+            throw new IllegalArgumentException("El socio no está inscrito en el torneo");
+        }
+
+        boolean liberarPreferencial = torneo.usoCupoPreferencial(socio.getIdUsuario())
+                || (!torneo.tieneRegistroTipoCupo(socio.getIdUsuario())
+                        && esSocioMejorRankeado(socio, torneo.getDeporte(), torneo.getCategoria()));
+        torneo.desinscribirParticipante(socio, liberarPreferencial);
+    }
+
+    // Determina si un equipo está en el top 20% mejor rankeado de su deporte y categoría
+    public boolean esEquipoMejorRankeado(Equipo equipo) {
+        List<Equipo> mismaCategoria = new ArrayList<>();
+        for (Equipo eq : equipos.values()) {
+            if (eq.getDeporteEquipo() == equipo.getDeporteEquipo()
+                    && eq.getCategoriaEdad() == equipo.getCategoriaEdad()) {
+                mismaCategoria.add(eq);
+            }
+        }
+        mismaCategoria.sort((a, b) -> Double.compare(b.obtenerPuntajeRankingTotal(), a.obtenerPuntajeRankingTotal()));
+
+        if (equipo.obtenerPuntajeRankingTotal() <= 0 || mismaCategoria.isEmpty()) {
+            return false;
+        }
+        int cantidadTop = Math.max(1, (int) Math.ceil(mismaCategoria.size() * 0.20));
+        for (int i = 0; i < Math.min(cantidadTop, mismaCategoria.size()); i++) {
+            if (mismaCategoria.get(i) == equipo) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // HU-07 CA-1 a CA-5: Entrenador inscribe a su equipo en un torneo de conjunto
+    public void inscribirEquipoTorneoConjunto(String idEntrenador, String idTorneo, String nombreEquipo) {
+        Usuario u = usuarios.get(idEntrenador);
+        if (!(u instanceof Entrenador)) {
+            throw new IllegalArgumentException("Solo un entrenador puede inscribir equipos a un torneo");
+        }
+        Entrenador entrenador = (Entrenador) u;
+        Torneo t = torneos.get(idTorneo);
+        if (!(t instanceof TorneoConjunto)) {
+            throw new IllegalArgumentException("El torneo de conjunto no existe");
+        }
+        TorneoConjunto torneo = (TorneoConjunto) t;
+        Equipo equipo = equipos.get(nombreEquipo);
+        if (equipo == null) {
+            throw new IllegalArgumentException("El equipo no existe");
+        }
+
+        if (!Torneo.EN_CURSO.equalsIgnoreCase(torneo.getEstado())) {
+            throw new IllegalArgumentException("El torneo ya ha finalizado");
+        }
+        if (torneo.estaEquipoInscrito(equipo)) {
+            throw new IllegalArgumentException("El equipo ya se encuentra inscrito en el torneo");
+        }
+        if (torneo.getDeporte() != equipo.getDeporteEquipo() || torneo.getCategoria() != equipo.getCategoriaEdad()) {
+            throw new IllegalArgumentException("El deporte o la categoría del torneo no corresponden a la del equipo que se intentó inscribir");
+        }
+
+        boolean mejorRankeado = esEquipoMejorRankeado(equipo);
+        if (mejorRankeado && torneo.getCuposPreferenciales() > 0) {
+            torneo.inscribirEquipo(equipo, entrenador, true);
+        } else if (torneo.getCuposGenerales() > 0) {
+            torneo.inscribirEquipo(equipo, entrenador, false);
+        } else {
+            throw new IllegalArgumentException("No quedan cupos generales disponibles en el torneo");
+        }
+    }
+
+    // HU-08 CA-1, CA-2 y CA-3: Empleado (entrenador o fisioterapeuta) se inscribe a un torneo individual
+    public void inscribirEmpleadoTorneoIndividual(String idEmpleado, String idTorneo) {
+        Usuario u = usuarios.get(idEmpleado);
+        if (!(u instanceof Empleado)) {
+            throw new IllegalArgumentException("Solo un empleado (entrenador o fisioterapeuta) puede realizar esta inscripción");
+        }
+        Empleado empleado = (Empleado) u;
+        Torneo t = torneos.get(idTorneo);
+        if (!(t instanceof TorneoIndividual)) {
+            throw new IllegalArgumentException("El torneo individual no existe");
+        }
+        TorneoIndividual torneo = (TorneoIndividual) t;
+
+        if (!Torneo.EN_CURSO.equalsIgnoreCase(torneo.getEstado())) {
+            throw new IllegalArgumentException("El torneo ya ha finalizado");
+        }
+        if (torneo.estaParticipanteInscrito(empleado)) {
+            throw new IllegalArgumentException("El empleado ya se encuentra inscrito en el torneo");
+        }
+        if (torneo.getCuposGenerales() <= 0) {
+            throw new IllegalArgumentException("No quedan cupos generales disponibles en el torneo");
+        }
+        torneo.inscribirParticipante(empleado, false);
+    }
+
+    public void registrarPartidoTorneoConjunto(String idTorneo, String idPartido, String fecha,
+                                               String nombreEquipo1, String nombreEquipo2, String marcador) {
+        Torneo t = torneos.get(idTorneo);
+        if (!(t instanceof TorneoConjunto)) {
+            throw new IllegalArgumentException("El torneo de conjunto no existe");
+        }
+        TorneoConjunto torneo = (TorneoConjunto) t;
+        Equipo e1 = equipos.get(nombreEquipo1);
+        Equipo e2 = equipos.get(nombreEquipo2);
+        if (!torneo.estaEquipoInscrito(e1) || !torneo.estaEquipoInscrito(e2)) {
+            throw new IllegalArgumentException("Ambos equipos deben estar inscritos en el torneo");
+        }
+        int[] goles = separarMarcador(marcador);
+        Deporte deporte = torneo.getDeporte();
+        if (goles[0] == goles[1] && !deporte.isPermiteEmpate()) {
+            throw new IllegalArgumentException("En este deporte no se permiten empates");
+        }
+        PartidoInterno partido = new PartidoInterno(idPartido, fecha, goles[0] + "-" + goles[1], "Finalizado", deporte, e1, e2);
+        agregarPartido(partido);
+        torneo.agregarPartido(partido);
+
+        if (goles[0] > goles[1]) {
+            torneo.sumarPuntosParticipante(e1.getNombreEquipo(), deporte.getPuntosVictoria());
+            torneo.sumarPuntosParticipante(e2.getNombreEquipo(), deporte.getPuntosDerrota());
+        } else if (goles[0] < goles[1]) {
+            torneo.sumarPuntosParticipante(e2.getNombreEquipo(), deporte.getPuntosVictoria());
+            torneo.sumarPuntosParticipante(e1.getNombreEquipo(), deporte.getPuntosDerrota());
+        } else {
+            torneo.sumarPuntosParticipante(e1.getNombreEquipo(), deporte.getPuntosEmpate());
+            torneo.sumarPuntosParticipante(e2.getNombreEquipo(), deporte.getPuntosEmpate());
+        }
+    }
+
+    public void registrarPartidoTorneoIndividual(String idTorneo, String idPartido, String fecha,
+                                                 String idJugador1, String idJugador2, int sets1, int sets2) {
+        Torneo t = torneos.get(idTorneo);
+        if (!(t instanceof TorneoIndividual)) {
+            throw new IllegalArgumentException("El torneo individual no existe");
+        }
+        TorneoIndividual torneo = (TorneoIndividual) t;
+        Usuario j1 = usuarios.get(idJugador1);
+        Usuario j2 = usuarios.get(idJugador2);
+        if (!torneo.estaParticipanteInscrito(j1) || !torneo.estaParticipanteInscrito(j2)) {
+            throw new IllegalArgumentException("Ambos participantes deben estar inscritos en el torneo");
+        }
+        validarNoNegativos(sets1, sets2);
+        if (sets1 == sets2) {
+            throw new IllegalArgumentException("En los deportes individuales no hay empates");
+        }
+        Deporte deporte = torneo.getDeporte();
+        PartidoIndividual partido = new PartidoIndividual(idPartido, fecha, sets1 + "-" + sets2, "Finalizado", deporte, j1, j2);
+        agregarPartido(partido);
+        torneo.agregarPartido(partido);
+
+        Usuario ganador = sets1 > sets2 ? j1 : j2;
+        Usuario perdedor = sets1 > sets2 ? j2 : j1;
+        torneo.sumarPuntosParticipante(ganador.getIdUsuario(), deporte.getPuntosVictoria());
+        torneo.sumarPuntosParticipante(perdedor.getIdUsuario(), deporte.getPuntosDerrota());
+    }
+
+    // HU-05 CA-1, CA-2 y CA-3: Consultar torneos en los que participa o participó un usuario
+    public List<Torneo> obtenerTorneosDeParticipante(String idParticipante) {
+        Usuario u = usuarios.get(idParticipante);
+        if (u == null) {
+            throw new IllegalArgumentException("El usuario no existe");
+        }
+        Set<Torneo> asociados = new LinkedHashSet<>();
+        for (Torneo torneo : torneos.values()) {
+            if (torneo instanceof TorneoIndividual) {
+                if (((TorneoIndividual) torneo).estaParticipanteInscrito(u)) {
+                    asociados.add(torneo);
+                }
+            } else if (torneo instanceof TorneoConjunto) {
+                TorneoConjunto tc = (TorneoConjunto) torneo;
+                if (u instanceof Socio) {
+                    for (Equipo eq : tc.getEquiposInscritos()) {
+                        if (eq.getSocios().contains(u)) {
+                            asociados.add(torneo);
+                        }
+                    }
+                } else if (u instanceof Entrenador) {
+                    if (tc.getEntrenadoresInscriptores().containsValue(u)) {
+                        asociados.add(torneo);
+                    }
+                    for (Equipo eq : tc.getEquiposInscritos()) {
+                        if (eq.getEntrenador() == u) {
+                            asociados.add(torneo);
+                        }
+                    }
+                }
+            }
+        }
+        if (asociados.isEmpty()) {
+            throw new IllegalArgumentException("No hay ningún torneo por consultar");
+        }
+        return new ArrayList<>(asociados);
+    }
+
+    // HU-05 CA-1 y CA-2: Consultar el historial detallado (encuentros, participantes, posiciones)
+    public String consultarHistorialTorneo(String idParticipante, String idTorneo) {
+        List<Torneo> misTorneos = obtenerTorneosDeParticipante(idParticipante);
+        Torneo seleccionado = null;
+        for (Torneo t : misTorneos) {
+            if (t.getIdTorneo().equals(idTorneo)) {
+                seleccionado = t;
+                break;
+            }
+        }
+        if (seleccionado == null) {
+            throw new IllegalArgumentException("No se encuentra inscrito en el torneo seleccionado");
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== HISTORIAL DEL TORNEO: ").append(seleccionado.getNombre())
+          .append(" (").append(seleccionado.getIdTorneo()).append(") ===\n");
+        sb.append("Deporte: ").append(seleccionado.getDeporte().getNombreDeporte())
+          .append(" | Categoría: ").append(seleccionado.getCategoria())
+          .append(" | Estado: ").append(seleccionado.getEstado()).append("\n\n");
+
+        sb.append("PARTICIPANTES:\n");
+        if (seleccionado instanceof TorneoIndividual) {
+            for (Usuario p : ((TorneoIndividual) seleccionado).getParticipantesInscritos()) {
+                sb.append("- ").append(p.getNombre()).append(" ").append(p.getApellido())
+                  .append(" (").append(p.getClass().getSimpleName()).append(")\n");
+            }
+        } else if (seleccionado instanceof TorneoConjunto) {
+            for (Equipo eq : ((TorneoConjunto) seleccionado).getEquiposInscritos()) {
+                sb.append("- ").append(eq.getNombreEquipo()).append(" (").append(eq.getSocios().size()).append(" jugadores)\n");
+            }
+        }
+
+        sb.append("\nENCUENTROS:\n");
+        if (seleccionado.getListaPartidos().isEmpty()) {
+            sb.append("- Sin encuentros registrados hasta la fecha.\n");
+        } else {
+            for (Partido p : seleccionado.getListaPartidos()) {
+                sb.append("- ").append(describirPartido(p)).append("\n");
+            }
+        }
+
+        sb.append("\nTABLA DE POSICIONES:\n");
+        int puesto = 1;
+        for (String clave : seleccionado.obtenerPosicionesOrdenadas()) {
+            String nombreMostrar = clave;
+            if (seleccionado instanceof TorneoIndividual && usuarios.containsKey(clave)) {
+                Usuario u = usuarios.get(clave);
+                nombreMostrar = u.getNombre() + " " + u.getApellido() + " (" + u.getIdUsuario() + ")";
+            }
+            int puntos = seleccionado.getTablaPosiciones().get(clave);
+            sb.append(puesto++).append(". ").append(nombreMostrar).append(" - ").append(puntos).append(" pts\n");
+        }
+        return sb.toString();
+    }
+
+    // PERSISTENCIA
     public void cargarUsuarios(String archivo) {
         try {
             CentralPersistencia.getPersistenciaClubDeportivo().cargarUsuarios(this, archivo);
@@ -1283,6 +1717,7 @@ public class ClubDeportivoSeneca {
     public Map<String, Instalacion> getInstalaciones() { return instalaciones; }
     public Map<String, Reserva> getReservas() { return reservas; }
     public Map<String, Partido> getPartidos() { return partidos; }
+    public Map<String, Torneo> getTorneos() { return torneos; }
     public Map<String, SesionEntrenamiento> getSesionesEntrenamiento() { return sesionesEntrenamiento; }
     public List<AsistenciaEvaluacion> getAsistenciaEvaluaciones() { return asistenciaEvaluaciones; }
     public Map<String, Turno> getTurnos() { return turnos; }
