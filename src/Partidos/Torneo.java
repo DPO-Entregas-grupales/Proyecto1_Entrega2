@@ -9,6 +9,9 @@ import Deportes.Deporte;
 public abstract class Torneo {
     public static final String EN_CURSO = "En curso";
     public static final String FINALIZADO = "Finalizado";
+    public static final String RECREATIVO = "Recreativo";
+    public static final String COMPETITIVO = "Competitivo";
+    public static final double PORCENTAJE_PREMIO = 0.80;
 
     protected String idTorneo;
     protected String nombre;
@@ -20,6 +23,11 @@ public abstract class Torneo {
     protected int cuposGenerales;
     protected List<Partido> listaPartidos;
     protected Map<String, Integer> tablaPosiciones;
+    protected String modalidad = RECREATIVO;
+    protected double tarifaInscripcion;
+    protected double totalRecaudado;
+    protected double premio;
+    protected String ganadorPremio;
 
     public Torneo(String idTorneo, String nombre, Deporte deporte, int categoria, int cuposTotales) {
         if (cuposTotales <= 0) {
@@ -37,6 +45,49 @@ public abstract class Torneo {
         this.tablaPosiciones = new LinkedHashMap<String, Integer>();
     }
 
+    public void convertirEnCompetitivo(double tarifa) {
+        if (tarifa <= 0) {
+            throw new IllegalArgumentException("La tarifa de inscripción debe ser mayor a cero");
+        }
+        this.modalidad = COMPETITIVO;
+        this.tarifaInscripcion = tarifa;
+    }
+
+    public boolean isCompetitivo() {
+        return COMPETITIVO.equals(modalidad);
+    }
+
+    public void cobrarInscripcion() {
+        if (isCompetitivo()) {
+            this.totalRecaudado += this.tarifaInscripcion;
+        }
+    }
+
+    public void reembolsarInscripcion() {
+        if (isCompetitivo()) {
+            this.totalRecaudado = Math.max(0, this.totalRecaudado - this.tarifaInscripcion);
+        }
+    }
+
+    public double calcularPremio() {
+        return this.totalRecaudado * PORCENTAJE_PREMIO;
+    }
+
+    public void otorgarPremio(String claveGanador) {
+        this.ganadorPremio = claveGanador;
+        this.premio = calcularPremio();
+    }
+
+    public String getModalidad() { return modalidad; }
+    public double getTarifaInscripcion() { return tarifaInscripcion; }
+    public double getTotalRecaudado() { return totalRecaudado; }
+    public void setTotalRecaudado(double totalRecaudado) { this.totalRecaudado = totalRecaudado; }
+    public double getPremio() { return premio; }
+    public void setPremio(double premio) { this.premio = premio; }
+    public String getGanadorPremio() { return ganadorPremio; }
+    public void setGanadorPremio(String ganadorPremio) { this.ganadorPremio = ganadorPremio; }
+    
+    
     public void agregarPartido(Partido partido) {
         if (partido != null) {
             this.listaPartidos.add(partido);

@@ -52,6 +52,8 @@ public class TorneoConjunto extends Torneo {
         if (entrenador != null) {
             entrenadoresInscriptores.put(equipo.getNombreEquipo(), entrenador);
         }
+        
+        cobrarInscripcion();
     }
 
     public String getDisciplina() { return disciplina; }

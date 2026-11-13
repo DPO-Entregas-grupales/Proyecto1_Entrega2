@@ -35,6 +35,11 @@ import Estadisticas.EstadisticaVoleibol;
 import Estadisticas.EstadisticaRaqueta;
 import Estadisticas.EstadisticaBaloncesto;
 
+import Partidos.Torneo;
+import Partidos.TorneoConjunto;
+import Partidos.TorneoIndividual;
+import Usuarios.Usuario;
+
 public class PersistenciaClubDeportivoJson {
 
     private static final String DEPORTES = "deportes";
@@ -51,6 +56,7 @@ public class PersistenciaClubDeportivoJson {
     private static final String TURNOS = "turnos";
     private static final String SOLICITUDES_CAMBIO_TURNO = "solicitudesCambioTurno";
     private static final String ESTADISTICAS = "estadisticas";
+    private static final String TORNEOS = "torneos";
 
     private PersistenciaUsuariosJson persistenciaUsuarios = new PersistenciaUsuariosJson();
 
@@ -84,6 +90,7 @@ public class PersistenciaClubDeportivoJson {
         if (raiz.has(TURNOS)) cargarTurnos(club, raiz.getJSONArray(TURNOS));
         if (raiz.has(SOLICITUDES_CAMBIO_TURNO)) cargarSolicitudesCambioTurno(club, raiz.getJSONArray(SOLICITUDES_CAMBIO_TURNO));
         if (raiz.has(ESTADISTICAS)) cargarEstadisticas(club, raiz.getJSONArray(ESTADISTICAS));
+        if (raiz.has(TORNEOS)) cargarTorneos(club, raiz.getJSONArray(TORNEOS));
     }
 
     private void cargarDeportes(ClubDeportivoSeneca club, JSONArray jDeportes) {
@@ -367,6 +374,7 @@ public class PersistenciaClubDeportivoJson {
         salvarTurnos(club, raiz);
         salvarSolicitudesCambioTurno(club, raiz);
         salvarEstadisticas(club, raiz);
+        salvarTorneos(club, raiz);
 
         try (PrintWriter pw = new PrintWriter(archivo)) {
             pw.println(raiz.toString(4));
@@ -641,5 +649,166 @@ public class PersistenciaClubDeportivoJson {
             jEstadisticas.put(jObj);
         }
         raiz.put(ESTADISTICAS, jEstadisticas);
+    }
+    
+    // -----------------------------
+    // ENUNCIADO PROYECTO 2 - TORNEOS INTERNOS
+    
+    private void salvarTorneos(ClubDeportivoSeneca club, JSONObject raiz) {
+        JSONArray jArray = new JSONArray();
+        for (Torneo torneo : club.getTorneos().values()) {
+            JSONObject jObj = new JSONObject();
+            jObj.put("idTorneo", torneo.getIdTorneo());
+            jObj.put("nombre", torneo.getNombre());
+            jObj.put("nombreDeporte", torneo.getDeporte().getNombreDeporte());
+            jObj.put("categoria", torneo.getCategoria());
+            jObj.put("estado", torneo.getEstado());
+            jObj.put("cuposTotales", torneo.getCuposTotales());
+            jObj.put("cuposPreferenciales", torneo.getCuposPreferenciales());
+            jObj.put("cuposGenerales", torneo.getCuposGenerales());
+
+            JSONArray jPartidos = new JSONArray();
+            for (Partido partido : torneo.getListaPartidos()) {
+                jPartidos.put(partido.getIdPartido());
+            }
+            jObj.put("idPartidos", jPartidos);
+
+            // Se guarda como lista para conservar el orden (desempata el primer lugar).
+            JSONArray jPosiciones = new JSONArray();
+            for (Map.Entry<String, Integer> entrada : torneo.getTablaPosiciones().entrySet()) {
+                JSONObject jPos = new JSONObject();
+                jPos.put("clave", entrada.getKey());
+                jPos.put("puntos", entrada.getValue());
+                jPosiciones.put(jPos);
+            }
+            jObj.put("tablaPosiciones", jPosiciones);
+            
+            jObj.put("modalidad", torneo.getModalidad());
+            jObj.put("tarifaInscripcion", torneo.getTarifaInscripcion());
+            jObj.put("totalRecaudado", torneo.getTotalRecaudado());
+            jObj.put("premio", torneo.getPremio());
+            if (torneo.getGanadorPremio() != null) {
+                jObj.put("ganadorPremio", torneo.getGanadorPremio());
+            }
+            
+            if (torneo instanceof TorneoConjunto) {
+                TorneoConjunto conjunto = (TorneoConjunto) torneo;
+                jObj.put("tipo", "CONJUNTO");
+                JSONArray jEquipos = new JSONArray();
+                for (Equipo equipo : conjunto.getEquiposInscritos()) {
+                    JSONObject jEquipo = new JSONObject();
+                    jEquipo.put("nombreEquipo", equipo.getNombreEquipo());
+                    jEquipo.put("preferencial", conjunto.getEquiposCupoPreferencial().contains(equipo.getNombreEquipo()));
+                    Entrenador inscriptor = conjunto.getEntrenadoresInscriptores().get(equipo.getNombreEquipo());
+                    if (inscriptor != null) {
+                        jEquipo.put("idEntrenador", inscriptor.getIdUsuario());
+                    }
+                    jEquipos.put(jEquipo);
+                }
+                jObj.put("equipos", jEquipos);
+            } else if (torneo instanceof TorneoIndividual) {
+                TorneoIndividual individual = (TorneoIndividual) torneo;
+                jObj.put("tipo", "INDIVIDUAL");
+                JSONArray jParticipantes = new JSONArray();
+                for (Usuario participante : individual.getParticipantesInscritos()) {
+                    JSONObject jParticipante = new JSONObject();
+                    jParticipante.put("idUsuario", participante.getIdUsuario());
+                    jParticipante.put("preferencial", individual.usoCupoPreferencial(participante.getIdUsuario()));
+                    jParticipantes.put(jParticipante);
+                }
+                jObj.put("participantes", jParticipantes);
+            }
+            jArray.put(jObj);
+        }
+        raiz.put(TORNEOS, jArray);
+    }
+
+    private void cargarTorneos(ClubDeportivoSeneca club, JSONArray jArray) {
+        for (int i = 0; i < jArray.length(); i++) {
+            JSONObject jObj = jArray.getJSONObject(i);
+            Deporte deporte = club.getDeportes().get(jObj.getString("nombreDeporte"));
+            if (deporte == null) {
+                continue;
+            }
+            String id = jObj.getString("idTorneo");
+            String nombre = jObj.getString("nombre");
+            int categoria = jObj.getInt("categoria");
+            int cuposTotales = jObj.getInt("cuposTotales");
+
+            Torneo torneo;
+            if ("CONJUNTO".equals(jObj.getString("tipo"))) {
+                TorneoConjunto conjunto = new TorneoConjunto(id, nombre, deporte, categoria, cuposTotales);
+                JSONArray jEquipos = jObj.optJSONArray("equipos");
+                if (jEquipos != null) {
+                    for (int j = 0; j < jEquipos.length(); j++) {
+                        JSONObject jEquipo = jEquipos.getJSONObject(j);
+                        String nombreEquipo = jEquipo.getString("nombreEquipo");
+                        Equipo equipo = club.getEquipos().get(nombreEquipo);
+                        if (equipo != null) {
+                            conjunto.getEquiposInscritos().add(equipo);
+                            if (jEquipo.optBoolean("preferencial", false)) {
+                                conjunto.getEquiposCupoPreferencial().add(nombreEquipo);
+                            }
+                            Usuario entrenador = club.getUsuarios().get(jEquipo.optString("idEntrenador", ""));
+                            if (entrenador instanceof Entrenador) {
+                                conjunto.getEntrenadoresInscriptores().put(nombreEquipo, (Entrenador) entrenador);
+                            }
+                        }
+                    }
+                }
+                torneo = conjunto;
+            } else {
+                TorneoIndividual individual = new TorneoIndividual(id, nombre, deporte, categoria, cuposTotales);
+                JSONArray jParticipantes = jObj.optJSONArray("participantes");
+                if (jParticipantes != null) {
+                    for (int j = 0; j < jParticipantes.length(); j++) {
+                        JSONObject jParticipante = jParticipantes.getJSONObject(j);
+                        String idUsuario = jParticipante.getString("idUsuario");
+                        Usuario participante = club.getUsuarios().get(idUsuario);
+                        if (participante != null) {
+                            individual.getParticipantesInscritos().add(participante);
+                            if (jParticipante.optBoolean("preferencial", false)) {
+                                individual.getIdsCupoPreferencial().add(idUsuario);
+                            } else {
+                                individual.getIdsCupoGeneral().add(idUsuario);
+                            }
+                        }
+                    }
+                }
+                torneo = individual;
+            }
+
+            torneo.setEstado(jObj.getString("estado"));
+            torneo.setCuposPreferenciales(jObj.getInt("cuposPreferenciales"));
+            torneo.setCuposGenerales(jObj.getInt("cuposGenerales"));
+            
+            if (Torneo.COMPETITIVO.equals(jObj.optString("modalidad", Torneo.RECREATIVO))) {
+                torneo.convertirEnCompetitivo(jObj.getDouble("tarifaInscripcion"));
+            }
+            torneo.setTotalRecaudado(jObj.optDouble("totalRecaudado", 0));
+            torneo.setPremio(jObj.optDouble("premio", 0));
+            String ganadorPremio = jObj.optString("ganadorPremio", "");
+            if (!ganadorPremio.isEmpty()) {
+                torneo.setGanadorPremio(ganadorPremio);
+            }
+            
+            JSONArray jPosiciones = jObj.optJSONArray("tablaPosiciones");
+            if (jPosiciones != null) {
+                for (int j = 0; j < jPosiciones.length(); j++) {
+                    JSONObject jPos = jPosiciones.getJSONObject(j);
+                    torneo.getTablaPosiciones().put(jPos.getString("clave"), jPos.getInt("puntos"));
+                }
+            }
+            JSONArray jPartidos = jObj.optJSONArray("idPartidos");
+            if (jPartidos != null) {
+                for (int j = 0; j < jPartidos.length(); j++) {
+                    Partido partido = club.getPartidos().get(jPartidos.getString(j));
+                    if (partido != null) {
+                        torneo.agregarPartido(partido);
+                    }
+                }
+            }
+            club.agregarTorneo(torneo);
+        }
     }
 }

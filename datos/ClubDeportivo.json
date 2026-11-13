@@ -1,16 +1,487 @@
 {
+    "torneos": [
+        {
+            "cuposPreferenciales": 3,
+            "estado": "En curso",
+            "tipo": "CONJUNTO",
+            "cuposTotales": 16,
+            "categoria": 15,
+            "cuposGenerales": 13,
+            "nombreDeporte": "Fútbol",
+            "tablaPosiciones": [],
+            "idPartidos": [],
+            "nombre": "Copa Verano",
+            "idTorneo": "TOR-2",
+            "equipos": []
+        },
+        {
+            "cuposPreferenciales": 4,
+            "estado": "En curso",
+            "tipo": "CONJUNTO",
+            "cuposTotales": 24,
+            "categoria": 13,
+            "cuposGenerales": 19,
+            "nombreDeporte": "Fútbol",
+            "tablaPosiciones": [{
+                "clave": "Cachorros Sub-13",
+                "puntos": 0
+            }],
+            "idPartidos": [],
+            "nombre": "Torneo de Invierno",
+            "idTorneo": "TOR-3",
+            "equipos": [{
+                "nombreEquipo": "Cachorros Sub-13",
+                "idEntrenador": "2",
+                "preferencial": false
+            }]
+        },
+        {
+            "cuposPreferenciales": 1,
+            "estado": "En curso",
+            "tipo": "INDIVIDUAL",
+            "cuposTotales": 5,
+            "categoria": 99,
+            "cuposGenerales": 3,
+            "nombreDeporte": "Tenis",
+            "tablaPosiciones": [{
+                "clave": "8",
+                "puntos": 0
+            }],
+            "idPartidos": [],
+            "nombre": "Abierto de Séneca",
+            "idTorneo": "TOR-1",
+            "participantes": [{
+                "idUsuario": "8",
+                "preferencial": false
+            }]
+        }
+    ],
     "reservas": [],
-    "instalaciones": [],
-    "deportes": [],
-    "competencias": [],
-    "partidos": [],
-    "inscripcionesEquipo": [],
-    "inscripcionesIndividual": [],
-    "estadisticas": [],
-    "asistenciaEvaluaciones": [],
-    "inscripcionesCompetencia": [],
-    "turnos": [],
-    "sesionesEntrenamiento": [],
+    "instalaciones": [
+        {
+            "tipo": "Cancha de Fútbol",
+            "horarios": [
+                {
+                    "fecha": "2026-11-02",
+                    "hora": "16",
+                    "disponible": true
+                },
+                {
+                    "fecha": "2026-11-02",
+                    "hora": "17",
+                    "disponible": true
+                },
+                {
+                    "fecha": "2026-11-02",
+                    "hora": "18",
+                    "disponible": true
+                }
+            ],
+            "esTechada": false,
+            "nombre": "Cancha Principal",
+            "capacidadMaximaJugadores": 22
+        },
+        {
+            "tipo": "Cancha de Pádel",
+            "horarios": [
+                {
+                    "fecha": "2026-11-05",
+                    "hora": "16",
+                    "disponible": true
+                },
+                {
+                    "fecha": "2026-11-05",
+                    "hora": "18",
+                    "disponible": false
+                },
+                {
+                    "fecha": "2026-11-05",
+                    "hora": "17",
+                    "disponible": true
+                }
+            ],
+            "esTechada": true,
+            "nombre": "Cancha de Pádel 1",
+            "capacidadMaximaJugadores": 4
+        },
+        {
+            "tipo": "Cancha de Tenis",
+            "horarios": [
+                {
+                    "fecha": "2026-11-05",
+                    "hora": "16",
+                    "disponible": true
+                },
+                {
+                    "fecha": "2026-11-05",
+                    "hora": "18",
+                    "disponible": true
+                },
+                {
+                    "fecha": "2026-11-05",
+                    "hora": "17",
+                    "disponible": true
+                }
+            ],
+            "esTechada": false,
+            "nombre": "Cancha de Tenis A",
+            "capacidadMaximaJugadores": 4
+        }
+    ],
+    "deportes": [
+        {
+            "minJugadores": 7,
+            "permiteEmpate": true,
+            "puntosDerrota": 0,
+            "posiciones": [
+                "Portero",
+                "Defensa",
+                "Mediocampista",
+                "Delantero"
+            ],
+            "puntosEmpate": 1,
+            "nombreDeporte": "Fútbol",
+            "puntosVictoria": 3
+        },
+        {
+            "minJugadores": 5,
+            "permiteEmpate": false,
+            "puntosDerrota": 0,
+            "posiciones": [
+                "Base",
+                "Escolta",
+                "Alero",
+                "Ala-pívot",
+                "Pívot"
+            ],
+            "puntosEmpate": 0,
+            "nombreDeporte": "Baloncesto",
+            "puntosVictoria": 2
+        },
+        {
+            "minJugadores": 1,
+            "permiteEmpate": false,
+            "puntosDerrota": 0,
+            "posiciones": [],
+            "puntosEmpate": 0,
+            "nombreDeporte": "Tenis",
+            "puntosVictoria": 2
+        }
+    ],
+    "competencias": [{
+        "anioTemporada": "2026",
+        "formato": "Eliminatoria",
+        "categoria": 99,
+        "nombreCompetencia": "Copa Séneca 2026",
+        "entidadOrganizadora": "ASCUN",
+        "faseActual": "Fase de Grupos"
+    }],
+    "partidos": [
+        {
+            "fecha": "2026-10-10",
+            "tipoPartido": "INTERNO",
+            "marcadorFinal": "2-1",
+            "idPartido": "1",
+            "estadoPartido": "Finalizado",
+            "nombreEquipo1": "Leones FC",
+            "nombreEquipo2": "Águilas FC"
+        },
+        {
+            "escenario": "Estadio Norte",
+            "fecha": "2026-10-17",
+            "tipoPartido": "COMPETENCIA",
+            "nombreEquipo": "Leones FC",
+            "marcadorFinal": "3-0",
+            "nombreCompetencia": "Copa Séneca 2026",
+            "idPartido": "2",
+            "institucionRival": "Universidad Norte",
+            "estadoPartido": "Finalizado"
+        },
+        {
+            "fecha": "2026-11-02",
+            "tipoPartido": "INTERNO",
+            "marcadorFinal": "0-0",
+            "idPartido": "3",
+            "estadoPartido": "Programado",
+            "nombreEquipo1": "Leones FC",
+            "nombreEquipo2": "Águilas FC"
+        },
+        {
+            "escenario": "Estadio Séneca",
+            "fecha": "2026-11-09",
+            "tipoPartido": "COMPETENCIA",
+            "nombreEquipo": "Leones FC",
+            "marcadorFinal": "0-0",
+            "nombreCompetencia": "Copa Séneca 2026",
+            "idPartido": "4",
+            "institucionRival": "Club Andes",
+            "estadoPartido": "Programado"
+        }
+    ],
+    "inscripcionesEquipo": [
+        {
+            "posicion": "Delantero",
+            "numeroCamiseta": 9,
+            "estaSuspendido": false,
+            "nombreEquipo": "Leones FC",
+            "tarjetasAmarillasAcumuladas": 1,
+            "idSocio": "7"
+        },
+        {
+            "posicion": "Portero",
+            "numeroCamiseta": 1,
+            "estaSuspendido": false,
+            "nombreEquipo": "Leones FC",
+            "tarjetasAmarillasAcumuladas": 0,
+            "idSocio": "16"
+        },
+        {
+            "posicion": "Defensa",
+            "numeroCamiseta": 2,
+            "estaSuspendido": false,
+            "nombreEquipo": "Leones FC",
+            "tarjetasAmarillasAcumuladas": 0,
+            "idSocio": "17"
+        },
+        {
+            "posicion": "Defensa",
+            "numeroCamiseta": 3,
+            "estaSuspendido": false,
+            "nombreEquipo": "Leones FC",
+            "tarjetasAmarillasAcumuladas": 0,
+            "idSocio": "18"
+        },
+        {
+            "posicion": "Mediocampista",
+            "numeroCamiseta": 4,
+            "estaSuspendido": false,
+            "nombreEquipo": "Leones FC",
+            "tarjetasAmarillasAcumuladas": 0,
+            "idSocio": "19"
+        },
+        {
+            "posicion": "Mediocampista",
+            "numeroCamiseta": 5,
+            "estaSuspendido": false,
+            "nombreEquipo": "Leones FC",
+            "tarjetasAmarillasAcumuladas": 0,
+            "idSocio": "20"
+        },
+        {
+            "posicion": "Delantero",
+            "numeroCamiseta": 7,
+            "estaSuspendido": false,
+            "nombreEquipo": "Leones FC",
+            "tarjetasAmarillasAcumuladas": 0,
+            "idSocio": "21"
+        },
+        {
+            "posicion": "Delantero",
+            "numeroCamiseta": 11,
+            "estaSuspendido": false,
+            "nombreEquipo": "Leones FC",
+            "tarjetasAmarillasAcumuladas": 0,
+            "idSocio": "22"
+        },
+        {
+            "posicion": "Portero",
+            "numeroCamiseta": 1,
+            "estaSuspendido": false,
+            "nombreEquipo": "Águilas FC",
+            "tarjetasAmarillasAcumuladas": 0,
+            "idSocio": "23"
+        },
+        {
+            "posicion": "Defensa",
+            "numeroCamiseta": 2,
+            "estaSuspendido": false,
+            "nombreEquipo": "Águilas FC",
+            "tarjetasAmarillasAcumuladas": 0,
+            "idSocio": "24"
+        },
+        {
+            "posicion": "Defensa",
+            "numeroCamiseta": 3,
+            "estaSuspendido": false,
+            "nombreEquipo": "Águilas FC",
+            "tarjetasAmarillasAcumuladas": 0,
+            "idSocio": "25"
+        },
+        {
+            "posicion": "Mediocampista",
+            "numeroCamiseta": 4,
+            "estaSuspendido": false,
+            "nombreEquipo": "Águilas FC",
+            "tarjetasAmarillasAcumuladas": 0,
+            "idSocio": "26"
+        },
+        {
+            "posicion": "Mediocampista",
+            "numeroCamiseta": 5,
+            "estaSuspendido": false,
+            "nombreEquipo": "Águilas FC",
+            "tarjetasAmarillasAcumuladas": 0,
+            "idSocio": "27"
+        },
+        {
+            "posicion": "Delantero",
+            "numeroCamiseta": 7,
+            "estaSuspendido": false,
+            "nombreEquipo": "Águilas FC",
+            "tarjetasAmarillasAcumuladas": 0,
+            "idSocio": "28"
+        },
+        {
+            "posicion": "Delantero",
+            "numeroCamiseta": 9,
+            "estaSuspendido": false,
+            "nombreEquipo": "Águilas FC",
+            "tarjetasAmarillasAcumuladas": 0,
+            "idSocio": "29"
+        }
+    ],
+    "inscripcionesIndividual": [
+        {
+            "puntajeRanking": 4,
+            "idSocio": "7",
+            "nombreDeporte": "Tenis",
+            "nivel": "Intermedio"
+        },
+        {
+            "puntajeRanking": 0,
+            "idSocio": "8",
+            "nombreDeporte": "Tenis",
+            "nivel": "Principiante"
+        },
+        {
+            "puntajeRanking": 10,
+            "idSocio": "12",
+            "nombreDeporte": "Tenis",
+            "nivel": "Avanzado"
+        },
+        {
+            "puntajeRanking": 0,
+            "idSocio": "13",
+            "nombreDeporte": "Tenis",
+            "nivel": "Principiante"
+        }
+    ],
+    "estadisticas": [
+        {
+            "tarjetasRojas": 0,
+            "idEstadistica": "EST-1",
+            "tarjetasAmarillas": 1,
+            "tipoEstadistica": "FUTBOL",
+            "idSocio": "7",
+            "idPartido": "1",
+            "goles": 1,
+            "asistencias": 0
+        },
+        {
+            "tarjetasRojas": 0,
+            "idEstadistica": "EST-2",
+            "tarjetasAmarillas": 0,
+            "tipoEstadistica": "FUTBOL",
+            "idSocio": "7",
+            "idPartido": "2",
+            "goles": 2,
+            "asistencias": 1
+        },
+        {
+            "tarjetasRojas": 0,
+            "idEstadistica": "EST-3",
+            "tarjetasAmarillas": 0,
+            "tipoEstadistica": "FUTBOL",
+            "idSocio": "16",
+            "idPartido": "2",
+            "goles": 1,
+            "asistencias": 0
+        }
+    ],
+    "asistenciaEvaluaciones": [{
+        "estadoAsistencia": "Asistió",
+        "notaDesempeno": 4.5,
+        "idEntrenamiento": "ENT-1",
+        "idSocio": "7",
+        "comentario": "Buen ritmo"
+    }],
+    "inscripcionesCompetencia": [{
+        "posicion": "-",
+        "nombreEquipo": "Leones FC",
+        "nombreCompetencia": "Copa Séneca 2026",
+        "puntosAcumulados": 3
+    }],
+    "turnos": [
+        {
+            "diaSemana": 4,
+            "esDiurno": true,
+            "idEmpleados": [],
+            "idTurno": "T4"
+        },
+        {
+            "diaSemana": 1,
+            "esDiurno": true,
+            "idEmpleados": [
+                "2",
+                "3",
+                "5"
+            ],
+            "idTurno": "T1"
+        },
+        {
+            "diaSemana": 2,
+            "esDiurno": true,
+            "idEmpleados": [
+                "4",
+                "6"
+            ],
+            "idTurno": "T2"
+        },
+        {
+            "diaSemana": 3,
+            "esDiurno": true,
+            "idEmpleados": [
+                "2",
+                "3",
+                "4",
+                "5",
+                "6"
+            ],
+            "idTurno": "T3"
+        }
+    ],
+    "sesionesEntrenamiento": [{
+        "fecha": "2026-10-20",
+        "nombreInstalacion": "Cancha Principal",
+        "hora": "17:00",
+        "idSocios": [
+            "7",
+            "16",
+            "17"
+        ],
+        "idEntrenamiento": "ENT-1",
+        "idEntrenador": "2",
+        "duracionMinutos": 90
+    }],
     "solicitudesCambioTurno": [],
-    "equipos": []
+    "equipos": [
+        {
+            "cupoMaximo": 5,
+            "nombreEquipo": "Cachorros Sub-13",
+            "nombreDeporte": "Fútbol",
+            "categoriaEdad": 13
+        },
+        {
+            "cupoMaximo": 10,
+            "nombreEquipo": "Leones FC",
+            "nombreDeporte": "Fútbol",
+            "categoriaEdad": 99
+        },
+        {
+            "cupoMaximo": 8,
+            "nombreEquipo": "Águilas FC",
+            "nombreDeporte": "Fútbol",
+            "categoriaEdad": 99
+        }
+    ]
 }

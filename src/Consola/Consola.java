@@ -34,6 +34,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.time.LocalDateTime;
 
+import Partidos.Torneo;
+import Partidos.TorneoConjunto;
+import Partidos.TorneoIndividual;
+import Tienda.CalculadoraDescuento;
 
 public class Consola {
 
@@ -182,6 +186,7 @@ public class Consola {
         System.out.println("8. Gestión de turnos");
         System.out.println("9. Cerrar sesión");
         System.out.println("10. Reportes y consultas");
+        System.out.println("11. Gestión de torneos");
         System.out.println("0. Salir de la aplicación");
 
         int opcion = leerEntero("Opción: ");
@@ -196,6 +201,7 @@ public class Consola {
             case 8 -> menuTurnos();
             case 9 -> cerrarSesion();
             case 10 -> menuReportes();
+            case 11 -> menuTorneos();
             case 0 -> salir();
             default -> System.out.println("Opción no válida.");
         }
@@ -448,6 +454,8 @@ public class Consola {
         System.out.println("3. Reservar una instalación");
         System.out.println("4. Comprar en la tienda deportiva");
         System.out.println("5. Comprar en la cafetería");
+        System.out.println("6. Torneos");
+        System.out.println("7. Comprar en la tienda deportiva con un bono");
         System.out.println("9. Cerrar sesión");
         System.out.println("0. Salir de la aplicación");
 
@@ -458,6 +466,8 @@ public class Consola {
             case 3 -> reservarInstalacion();
             case 4 -> comprar(Venta.TIENDADEPORTIVA);
             case 5 -> comprar(Venta.CAFETERIA);
+            case 6 -> menuTorneosSocio();
+            case 7 -> comprarConBono();
             case 9 -> cerrarSesion();
             case 0 -> salir();
             default -> System.out.println("Opción no válida.");
@@ -662,6 +672,7 @@ public class Consola {
         System.out.println("5. Solicitar cambio de turno");
         System.out.println("6. Comprar en la tienda deportiva");
         System.out.println("7. Comprar en la cafetería");
+        System.out.println("8. Torneos");
         System.out.println("9. Cerrar sesión");
         System.out.println("0. Salir de la aplicación");
 
@@ -674,6 +685,7 @@ public class Consola {
             case 5 -> solicitarCambioTurno();
             case 6 -> comprar(Venta.TIENDADEPORTIVA);
             case 7 -> comprar(Venta.CAFETERIA);
+            case 8 -> menuTorneosEntrenador();
             case 9 -> cerrarSesion();
             case 0 -> salir();
             default -> System.out.println("Opción no válida.");
@@ -876,6 +888,7 @@ public class Consola {
         System.out.println("1. Crear turno");
         System.out.println("2. Asignar empleado a un turno");
         System.out.println("3. Ver turnos");
+        System.out.println("4. Torneos");
         System.out.println("0. Volver");
 
         int op = leerEntero("Opción: ");
@@ -916,6 +929,7 @@ public class Consola {
                     System.out.println(describirTurno(t));
                 }
             }
+            case 4 -> menuTorneosFisioterapeuta();
         }
     } 
 
@@ -969,14 +983,20 @@ public class Consola {
         }
     }
     
-    // ==========================================
-    // COMPRAS (de todos los roles**)
-    // ==========================================
+    // ----------------------------------
+    // COMPRAS (de todos los usuarios)
+ 
     //Se registran como códigos validos los de todos los empleados.
     private void registrarCodigosDescuento() {
         for (Usuario u : club.getUsuarios().values()) {
             if (u instanceof Empleado) {
                 tienda.getCalculadoraDescuento().agregarCodigoValido(((Empleado) u).getCodigoDescuento());
+            }
+            // Enunciado Proyecto 2
+            if (u instanceof Socio) {
+                for (String bono : ((Socio) u).getBonosDescuento()) {
+                    tienda.registrarBonoTorneo(bono);
+                }
             }
         }
     }
@@ -1049,6 +1069,11 @@ public class Consola {
         String codigo = "";
         if (!esCafeteria) {
             codigo = leerTexto("Código de descuento (Enter si no tiene): ");
+            
+            if (codigo.trim().toUpperCase().startsWith("BONO-")) {
+                System.out.println("Los bonos se redimen con la opción 'Comprar en la tienda deportiva con un bono'.");
+                return;
+            }
         }
         int puntos = 0;
         if (usuarioAutenticado.getPuntosFidelidad() > 0) {
@@ -1095,6 +1120,97 @@ public class Consola {
         System.out.println("Total a pagar" + detalleImpuestos + ": " + dinero(venta.getTotal()));
         System.out.println("Puntos ganados: " + (int) venta.getPuntosGanados());
         System.out.println("Sus puntos de fidelidad: " + usuarioAutenticado.getPuntosFidelidad());
+    }
+    
+    // Compra en la tienda deportiva con un bono de torneo (HU-06). Es una compra "en progreso":
+    // se arma, se aplica el bono y solo al confirmar se descuenta el inventario y se consume el bono.
+    private void comprarConBono() {
+        System.out.println("\n--- COMPRA EN LA TIENDA DEPORTIVA CON BONO ---");
+        Socio socio = (Socio) usuarioAutenticado;
+        if (!socio.tieneBonosDisponibles()) {
+            System.out.println("No tiene ningún bono de descuento por redimir.");
+            return;
+        }
+        Map<String, ArticuloTienda> catalogo = tienda.obtenerArticulosTienda();
+        if (catalogo.isEmpty()) {
+            System.out.println("No hay productos disponibles.");
+            return;
+        }
+
+        List<ItemVenta> items = new ArrayList<>();
+        boolean seguir = true;
+        while (seguir) {
+            System.out.println("Productos disponibles:");
+            for (ArticuloTienda a : catalogo.values()) {
+                System.out.println("- " + a.getNombre() + " // " + dinero(a.getPrecioBase()) + " // Stock: " + a.getCantidadInventario());
+            }
+            String nombre = leerTexto("Nombre del producto: ");
+            ArticuloTienda articulo = catalogo.get(nombre);
+            if (articulo == null) {
+                System.out.println("Producto no encontrado.");
+            } else {
+                int cantidad = leerEntero("Cantidad: ");
+                if (cantidad <= 0) {
+                    System.out.println("La cantidad debe ser mayor a cero.");
+                } else {
+                    ItemVenta existente = null;
+                    for (ItemVenta item : items) {
+                        if (item.getProducto() == articulo) {
+                            existente = item;
+                        }
+                    }
+                    if (existente != null) {
+                        existente.setCantidad(existente.getCantidad() + cantidad);
+                    } else {
+                        items.add(new ItemVenta(cantidad, articulo));
+                    }
+                    System.out.println("Agregado al carrito.");
+                }
+            }
+            seguir = leerTexto("¿Agregar otro producto? (s/n): ").equalsIgnoreCase("s");
+        }
+        if (items.isEmpty()) {
+            System.out.println("No se agregaron productos.");
+            return;
+        }
+
+        LocalDateTime ahora = LocalDateTime.now();
+        try {
+            Venta venta = tienda.iniciarCompraTienda(tienda.generarIdVenta(), ahora.toLocalDate().toString(),
+                    ahora.getHour(), usuarioAutenticado.getIdUsuario(), items, club);
+            System.out.println("Subtotal de la compra: " + dinero(venta.getSubTotal()));
+            System.out.println("Sus bonos:");
+            for (String bono : socio.getBonosDescuento()) {
+                System.out.println("- " + bono);
+            }
+            String codigoBono = leerTexto("Código del bono a aplicar (Enter para el primero): ");
+            if (!codigoBono.isEmpty() && !socio.tieneBonoDescuento(codigoBono)) {
+                System.out.println("Ese bono no está entre sus bonos.");
+                return;
+            }
+            tienda.aplicarBonoDescuento(venta, codigoBono);
+            System.out.println("Bono aplicado. Descuento: " + dinero(venta.getDescuento()));
+
+            String otro = leerTexto("¿Desea aplicar otro bono a esta compra? (s/n): ");
+            if (otro.equalsIgnoreCase("s")) {
+                try {
+                    tienda.aplicarBonoDescuento(venta, "");
+                } catch (IllegalArgumentException e) {
+                    System.out.println("No se pudo aplicar: " + e.getMessage());
+                }
+            }
+
+            String confirmar = leerTexto("¿Confirmar la compra? (s/n): ");
+            if (confirmar.equalsIgnoreCase("s")) {
+                tienda.confirmarCompraTienda(venta);
+                guardarTodo();
+                mostrarResumenVenta(venta);
+            } else {
+                System.out.println("Compra cancelada. El inventario y el bono no cambiaron.");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("No se pudo realizar la compra: " + e.getMessage());
+        }
     }
 
     private boolean loginDisponible(String login) {
@@ -1314,4 +1430,448 @@ public class Consola {
         System.out.println("Ventas del " + inicio + " al " + fin + ":");
         imprimir(tienda.reporteVentas(inicio.toString(), fin.toString()));
     }
+    
+    // -------------------------------
+    // ADMIN (ENUNCIADO PROYECTO 2)
+
+    private void menuTorneos() {
+        System.out.println("\n--- GESTIÓN DE TORNEOS ---");
+        System.out.println("1. Crear torneo de equipos (deporte de conjunto)");
+        System.out.println("2. Crear torneo individual");
+        System.out.println("3. Ver torneos");
+        System.out.println("4. Registrar un partido de torneo");
+        System.out.println("5. Finalizar un torneo");
+        System.out.println("0. Volver");
+
+        int op = leerEntero("Opción: ");
+        switch (op) {
+            case 1 -> crearTorneo(false);
+            case 2 -> crearTorneo(true);
+            case 3 -> {
+                if (!imprimirTorneos(false)) {
+                    System.out.println("No hay torneos creados.");
+                }
+            }
+            case 4 -> registrarPartidoTorneo();
+            case 5 -> finalizarTorneo();
+            case 0 -> { }
+            default -> System.out.println("Opción no válida.");
+        }
+    }
+
+    private String generarIdTorneo() {
+        int max = 0;
+        for (String id : club.getTorneos().keySet()) {
+            String digitos = id.replaceAll("[^0-9]", "");
+            if (!digitos.isEmpty()) {
+                max = Math.max(max, Integer.parseInt(digitos));
+            }
+        }
+        return "TOR-" + (max + 1);
+    }
+
+    private String describirTorneo(Torneo t) {
+        String tipo = "Individual";
+        int inscritos = 0;
+        if (t instanceof TorneoConjunto) {
+            tipo = "Equipos";
+            inscritos = ((TorneoConjunto) t).getEquiposInscritos().size();
+        } else if (t instanceof TorneoIndividual) {
+            inscritos = ((TorneoIndividual) t).getParticipantesInscritos().size();
+        }
+        String modalidad = "Recreativo";
+        if (t.isCompetitivo()) {
+            modalidad = "Competitivo ($" + Math.round(t.getTarifaInscripcion()) + ")";
+        }
+        return t.getIdTorneo() + " | " + t.getNombre() + " | " + tipo + " | " + modalidad + " | " + t.getDeporte().getNombreDeporte()
+                + " | categoría: " + t.getCategoria() + " | " + t.getEstado() + " | inscritos: " + inscritos
+                + " | cupos generales: " + t.getCuposGenerales() + " | preferenciales: " + t.getCuposPreferenciales();
+    }
+
+    // Imprime los torneos (todos o solo los que están en curso) y retorna false si no hay ninguno.
+    private boolean imprimirTorneos(boolean soloEnCurso) {
+        boolean hay = false;
+        for (Torneo t : club.getTorneos().values()) {
+            if (!soloEnCurso || Torneo.EN_CURSO.equalsIgnoreCase(t.getEstado())) {
+                hay = true;
+                System.out.println("- " + describirTorneo(t));
+            }
+        }
+        return hay;
+    }
+
+    private String nombreParticipante(String clave) {
+        Usuario usuario = club.getUsuarios().get(clave);
+        if (usuario != null) {
+            return usuario.getNombre() + " " + usuario.getApellido();
+        }
+        return clave;
+    }
+
+    private void crearTorneo(boolean individual) {
+        System.out.println("\n--- CREAR TORNEO ---");
+        System.out.println("Deportes disponibles:");
+        for (Deporte d : club.getDeportes().values()) {
+            if (d.esIndividual() == individual) {
+                System.out.println("- " + d.getNombreDeporte());
+            }
+        }
+        String id = generarIdTorneo();
+        String nombre = leerTexto("Nombre del torneo: ");
+        String deporte = leerTexto("Deporte: ");
+        int categoria = leerEntero("Categoría (edad máxima: 13, 15, 17 o 99 para Mayores): ");
+        int cupos = leerEntero("Número de cupos totales: ");
+        System.out.println("1. Recreativo (sin costo, premia con un bono de descuento)");
+        System.out.println("2. Competitivo (con tarifa de inscripción, premia en efectivo)");
+        int modalidad = leerEntero("Modalidad: ");
+        double tarifa = 0;
+        if (modalidad == 2) {
+            String quien = "equipo";
+            if (individual) {
+                quien = "jugador";
+            }
+            tarifa = leerDouble("Tarifa de inscripción por " + quien + ": ");
+        } else if (modalidad != 1) {
+            System.out.println("Modalidad no válida.");
+            return;
+        }
+        try {
+            String idAdmin = usuarioAutenticado.getIdUsuario();
+            if (modalidad == 2) {
+                if (individual) {
+                    club.crearTorneoIndividualCompetitivo(idAdmin, id, nombre, deporte, categoria, cupos, tarifa);
+                } else {
+                    club.crearTorneoConjuntoCompetitivo(idAdmin, id, nombre, deporte, categoria, cupos, tarifa);
+                }
+            } else {
+                if (individual) {
+                    club.crearTorneoIndividual(idAdmin, id, nombre, deporte, categoria, cupos);
+                } else {
+                    club.crearTorneoConjunto(idAdmin, id, nombre, deporte, categoria, cupos);
+                }
+            }
+            guardarTodo();
+            String texto = "recreativo";
+            if (modalidad == 2) {
+                texto = "competitivo";
+            }
+            System.out.println("Torneo " + texto + " creado (ID: " + id + "), en curso.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("No se pudo crear el torneo: " + e.getMessage());
+        }
+    }
+
+    private void registrarPartidoTorneo() {
+        System.out.println("\n--- REGISTRAR PARTIDO DE TORNEO ---");
+        System.out.println("Torneos en curso:");
+        if (!imprimirTorneos(true)) {
+            System.out.println("No hay torneos en curso.");
+            return;
+        }
+        String idTorneo = leerTexto("ID del torneo: ");
+        Torneo torneo = club.getTorneos().get(idTorneo);
+        if (torneo == null) {
+            System.out.println("El torneo no existe.");
+            return;
+        }
+        if (!Torneo.EN_CURSO.equalsIgnoreCase(torneo.getEstado())) {
+            System.out.println("El torneo ya ha finalizado.");
+            return;
+        }
+        String idPartido = String.valueOf(contadorPartidos);
+        String fecha = leerTexto("Fecha (YYYY-MM-DD): ");
+        try {
+            if (torneo instanceof TorneoConjunto) {
+                String e1 = leerTexto("Equipo 1: ");
+                String e2 = leerTexto("Equipo 2: ");
+                if (e1.equals(e2)) {
+                    System.out.println("Los equipos deben ser distintos.");
+                    return;
+                }
+                String marcador = leerTexto("Marcador final (ejemplo 2-1, primero el equipo 1): ");
+                club.registrarPartidoTorneoConjunto(idTorneo, idPartido, fecha, e1, e2, marcador);
+            } else {
+                String j1 = leerTexto("ID del jugador 1: ");
+                String j2 = leerTexto("ID del jugador 2: ");
+                if (j1.equals(j2)) {
+                    System.out.println("Los jugadores deben ser distintos.");
+                    return;
+                }
+                int sets1 = leerEntero("Sets ganados por el jugador 1: ");
+                int sets2 = leerEntero("Sets ganados por el jugador 2: ");
+                club.registrarPartidoTorneoIndividual(idTorneo, idPartido, fecha, j1, j2, sets1, sets2);
+            }
+            contadorPartidos++;
+            guardarTodo();
+            System.out.println("Partido registrado (ID: " + idPartido + "). La tabla de posiciones se actualizó.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("No se pudo registrar el partido: " + e.getMessage());
+        }
+    }
+
+    private void finalizarTorneo() {
+        System.out.println("\n--- FINALIZAR TORNEO ---");
+        System.out.println("Torneos:");
+        if (!imprimirTorneos(false)) {
+            System.out.println("No hay torneos creados.");
+            return;
+        }
+        String id = leerTexto("ID del torneo: ");
+        try {
+            club.finalizarTorneo(usuarioAutenticado.getIdUsuario(), id, tienda);
+            guardarTodo();
+            System.out.println("El torneo quedó en estado 'Finalizado'.");
+            Torneo torneo = club.getTorneos().get(id);
+            String primero = torneo.obtenerPrimerLugar();
+            if (primero == null) {
+                System.out.println("No hubo participantes: no se otorgó ningún premio.");
+            } else {
+                System.out.println("Primer lugar: " + nombreParticipante(primero));
+                if (torneo.isCompetitivo()) {
+                    if (torneo.getGanadorPremio() == null) {
+                        System.out.println("El primer lugar es un empleado: no recibe el premio en efectivo.");
+                    } else {
+                        System.out.println("Premio en efectivo: $" + Math.round(torneo.getPremio())
+                                + " (" + Math.round(Torneo.PORCENTAJE_PREMIO * 100) + "% de $"
+                                + Math.round(torneo.getTotalRecaudado()) + " recaudados).");
+                    }
+                } else {
+                    System.out.println("Si el ganador es socio, su bono ya quedó disponible para la tienda deportiva.");
+                }
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("No se pudo finalizar el torneo: " + e.getMessage());
+        }
+    }
+    
+    // -------------------------------
+    // Socios (ENUNCIADO PROYECTO 2)
+
+    private void menuTorneosSocio() {
+        System.out.println("\n--- TORNEOS ---");
+        System.out.println("1. Ver torneos");
+        System.out.println("2. Inscribirme a un torneo individual");
+        System.out.println("3. Salirme de un torneo individual");
+        System.out.println("4. Ver mis bonos de descuento");
+        System.out.println("5. Ver historial de mis torneos");
+        System.out.println("0. Volver");
+
+        int op = leerEntero("Opción: ");
+        switch (op) {
+            case 1 -> {
+                if (!imprimirTorneos(false)) {
+                    System.out.println("No hay torneos creados.");
+                }
+            }
+            case 2 -> inscribirseATorneoIndividual();
+            case 3 -> salirseDeTorneoIndividual();
+            case 4 -> verMisBonos();
+            case 5 -> consultarHistorialTorneos();
+            case 0 -> { }
+            default -> System.out.println("Opción no válida.");
+        }
+    }
+
+    // Imprime los torneos individuales en curso y retorna false si no hay ninguno.
+    private boolean imprimirTorneosIndividualesEnCurso() {
+        boolean hay = false;
+        for (Torneo t : club.getTorneos().values()) {
+            if (t instanceof TorneoIndividual && Torneo.EN_CURSO.equalsIgnoreCase(t.getEstado())) {
+                hay = true;
+                System.out.println("- " + describirTorneo(t));
+            }
+        }
+        return hay;
+    }
+
+    private void inscribirseATorneoIndividual() {
+        System.out.println("\n--- INSCRIPCIÓN A UN TORNEO INDIVIDUAL ---");
+        System.out.println("Torneos individuales en curso:");
+        if (!imprimirTorneosIndividualesEnCurso()) {
+            System.out.println("No hay torneos individuales en curso.");
+            return;
+        }
+        String idTorneo = leerTexto("ID del torneo: ");
+        try {
+            club.inscribirSocioTorneoIndividual(usuarioAutenticado.getIdUsuario(), idTorneo);
+            guardarTodo();
+            TorneoIndividual torneo = (TorneoIndividual) club.getTorneos().get(idTorneo);
+            if (torneo.usoCupoPreferencial(usuarioAutenticado.getIdUsuario())) {
+                System.out.println("Inscripción registrada con un cupo preferencial (por su ranking).");
+            } else {
+                System.out.println("Inscripción registrada con un cupo general.");
+            }
+            if (torneo.isCompetitivo()) {
+                System.out.println("Se registró el cobro de la tarifa: $" + Math.round(torneo.getTarifaInscripcion())
+                        + " (el pago lo gestiona un tercero).");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("No se pudo realizar la inscripción: " + e.getMessage());
+        }
+    }
+
+    private void salirseDeTorneoIndividual() {
+        System.out.println("\n--- SALIRSE DE UN TORNEO INDIVIDUAL ---");
+        System.out.println("Torneos individuales en curso:");
+        if (!imprimirTorneosIndividualesEnCurso()) {
+            System.out.println("No hay torneos individuales en curso.");
+            return;
+        }
+        String idTorneo = leerTexto("ID del torneo: ");
+        try {
+            club.desinscribirSocioTorneoIndividual(usuarioAutenticado.getIdUsuario(), idTorneo);
+            guardarTodo();
+            System.out.println("Se eliminó su inscripción y se liberó el cupo.");
+            if (club.getTorneos().get(idTorneo).isCompetitivo()) {
+                System.out.println("Se desconto su tarifa del total recaudado.");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("No se pudo cancelar la inscripción: " + e.getMessage());
+        }
+    }
+
+    private void verMisBonos() {
+        Socio socio = (Socio) usuarioAutenticado;
+        if (!socio.tieneBonosDisponibles()) {
+            System.out.println("No tiene bonos de descuento por redimir.");
+            return;
+        }
+        int porcentaje = (int) Math.round(CalculadoraDescuento.DESCUENTO_BONO_TORNEO * 100);
+        for (String bono : socio.getBonosDescuento()) {
+            System.out.println("- " + bono + " (" + porcentaje + "% de descuento en la tienda deportiva)");
+        }
+        System.out.println("Un bono se aplica durante una compra y no se acumula con otros descuentos.");
+    }
+    
+    
+    // ----------------------------------------------
+    // Entrenadores y Fisios (ENUNCIADO PROYECTO 2)
+
+    private void menuTorneosEntrenador() {
+        System.out.println("\n--- TORNEOS ---");
+        System.out.println("1. Ver torneos");
+        System.out.println("2. Inscribir un equipo en un torneo de equipos");
+        System.out.println("3. Inscribirme a un torneo individual");
+        System.out.println("4. Ver historial de mis torneos");
+        System.out.println("0. Volver");
+
+        int op = leerEntero("Opción: ");
+        switch (op) {
+            case 1 -> {
+                if (!imprimirTorneos(false)) {
+                    System.out.println("No hay torneos creados.");
+                }
+            }
+            case 2 -> inscribirEquipoATorneo();
+            case 3 -> inscribirseComoEmpleadoATorneo();
+            case 4 -> consultarHistorialTorneos();
+            case 0 -> { }
+            default -> System.out.println("Opción no válida.");
+        }
+    }
+
+    private void menuTorneosFisioterapeuta() {
+        System.out.println("\n--- TORNEOS ---");
+        System.out.println("1. Ver torneos");
+        System.out.println("2. Inscribirme a un torneo individual");
+        System.out.println("3. Ver historial de mis torneos");
+        System.out.println("0. Volver");
+
+        int op = leerEntero("Opción: ");
+        switch (op) {
+            case 1 -> {
+                if (!imprimirTorneos(false)) {
+                    System.out.println("No hay torneos creados.");
+                }
+            }
+            case 2 -> inscribirseComoEmpleadoATorneo();
+            case 3 -> consultarHistorialTorneos();
+            case 0 -> { }
+            default -> System.out.println("Opción no válida.");
+        }
+    }
+
+    // Imprime los torneos de equipos en curso y retorna false si no hay ninguno.
+    private boolean imprimirTorneosDeEquiposEnCurso() {
+        boolean hay = false;
+        for (Torneo t : club.getTorneos().values()) {
+            if (t instanceof TorneoConjunto && Torneo.EN_CURSO.equalsIgnoreCase(t.getEstado())) {
+                hay = true;
+                System.out.println("- " + describirTorneo(t));
+            }
+        }
+        return hay;
+    }
+
+    private void inscribirEquipoATorneo() {
+        System.out.println("\n--- INSCRIBIR UN EQUIPO EN UN TORNEO ---");
+        System.out.println("Torneos de equipos en curso:");
+        if (!imprimirTorneosDeEquiposEnCurso()) {
+            System.out.println("No hay torneos de equipos en curso.");
+            return;
+        }
+        String idTorneo = leerTexto("ID del torneo: ");
+        System.out.println("Equipos del club:");
+        for (Equipo e : club.getEquipos().values()) {
+            System.out.println("- " + e.getNombreEquipo() + " // " + e.getDeporteEquipo().getNombreDeporte()
+                    + " // categoría: " + e.getCategoriaEdad());
+        }
+        String nombreEquipo = leerTexto("Nombre del equipo: ");
+        try {
+            club.inscribirEquipoTorneoConjunto(usuarioAutenticado.getIdUsuario(), idTorneo, nombreEquipo);
+            guardarTodo();
+            TorneoConjunto torneo = (TorneoConjunto) club.getTorneos().get(idTorneo);
+            if (torneo.getEquiposCupoPreferencial().contains(nombreEquipo)) {
+                System.out.println("Equipo inscrito con un cupo preferencial (por su desempeño).");
+            } else {
+                System.out.println("Equipo inscrito con un cupo general.");
+            }
+            if (torneo.isCompetitivo()) {
+                System.out.println("Se registro el cobro de la tarifa del equipo: $" + Math.round(torneo.getTarifaInscripcion())
+                        + " (el pago lo gestiona un tercero).");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("No se pudo inscribir el equipo: " + e.getMessage());
+        }
+    }
+
+    // Lo usan el entrenador y el fisioterapeuta para inscribirse ellos mismos.
+    private void inscribirseComoEmpleadoATorneo() {
+        System.out.println("\n--- INSCRIPCIÓN A UN TORNEO INDIVIDUAL ---");
+        System.out.println("Torneos individuales en curso:");
+        if (!imprimirTorneosIndividualesEnCurso()) {
+            System.out.println("No hay torneos individuales en curso.");
+            return;
+        }
+        String idTorneo = leerTexto("ID del torneo: ");
+        try {
+            club.inscribirEmpleadoTorneoIndividual(usuarioAutenticado.getIdUsuario(), idTorneo);
+            guardarTodo();
+            System.out.println("Inscripción registrada con un cupo general.");
+            if (club.getTorneos().get(idTorneo).isCompetitivo()) {
+                System.out.println("Inscripción gratuita para empleados. Si queda en el primer lugar, no recibe el premio en efectivo.");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("No se pudo realizar la inscripción: " + e.getMessage());
+        }
+    }
+    
+    // COMPARTIDO para Socios, Entrenadores y Fisios
+    // Historial detallado de los torneos en los que participa el usuario autenticado (HU-05).
+    private void consultarHistorialTorneos() {
+        System.out.println("\n--- HISTORIAL DE MIS TORNEOS ---");
+        String idUsuario = usuarioAutenticado.getIdUsuario();
+        try {
+            List<Torneo> misTorneos = club.obtenerTorneosDeParticipante(idUsuario);
+            System.out.println("Sus torneos:");
+            for (Torneo t : misTorneos) {
+                System.out.println("- " + describirTorneo(t));
+            }
+            String idTorneo = leerTexto("ID del torneo a consultar: ");
+            System.out.println(club.consultarHistorialTorneo(idUsuario, idTorneo));
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+    
 }

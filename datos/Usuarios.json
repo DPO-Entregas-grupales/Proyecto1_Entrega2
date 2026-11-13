@@ -2,6 +2,7 @@
   {
     "idUsuario": "22",
     "apellido": "León",
+    "bonosDescuento": [],
     "contrasena": "pw",
     "tipoUsuario": "Socio",
     "puntosFidelidad": 0,
@@ -13,6 +14,7 @@
   {
     "idUsuario": "23",
     "apellido": "Águila",
+    "bonosDescuento": [],
     "contrasena": "pw",
     "tipoUsuario": "Socio",
     "puntosFidelidad": 0,
@@ -24,6 +26,7 @@
   {
     "idUsuario": "24",
     "apellido": "Águila",
+    "bonosDescuento": [],
     "contrasena": "pw",
     "tipoUsuario": "Socio",
     "puntosFidelidad": 0,
@@ -35,6 +38,7 @@
   {
     "idUsuario": "25",
     "apellido": "Águila",
+    "bonosDescuento": [],
     "contrasena": "pw",
     "tipoUsuario": "Socio",
     "puntosFidelidad": 0,
@@ -46,6 +50,7 @@
   {
     "idUsuario": "26",
     "apellido": "Águila",
+    "bonosDescuento": [],
     "contrasena": "pw",
     "tipoUsuario": "Socio",
     "puntosFidelidad": 0,
@@ -57,6 +62,7 @@
   {
     "idUsuario": "27",
     "apellido": "Águila",
+    "bonosDescuento": [],
     "contrasena": "pw",
     "tipoUsuario": "Socio",
     "puntosFidelidad": 0,
@@ -68,6 +74,7 @@
   {
     "idUsuario": "28",
     "apellido": "Águila",
+    "bonosDescuento": [],
     "contrasena": "pw",
     "tipoUsuario": "Socio",
     "puntosFidelidad": 0,
@@ -79,6 +86,7 @@
   {
     "idUsuario": "29",
     "apellido": "Águila",
+    "bonosDescuento": [],
     "contrasena": "pw",
     "tipoUsuario": "Socio",
     "puntosFidelidad": 0,
@@ -90,6 +98,7 @@
   {
     "idUsuario": "10",
     "apellido": "Ruiz",
+    "bonosDescuento": [],
     "contrasena": "pw",
     "tipoUsuario": "Socio",
     "puntosFidelidad": 0,
@@ -101,6 +110,7 @@
   {
     "idUsuario": "11",
     "apellido": "León",
+    "bonosDescuento": [],
     "contrasena": "pw",
     "tipoUsuario": "Socio",
     "puntosFidelidad": 0,
@@ -112,6 +122,7 @@
   {
     "idUsuario": "12",
     "apellido": "Vega",
+    "bonosDescuento": [],
     "contrasena": "pw",
     "tipoUsuario": "Socio",
     "puntosFidelidad": 0,
@@ -123,6 +134,7 @@
   {
     "idUsuario": "13",
     "apellido": "Ortiz",
+    "bonosDescuento": [],
     "contrasena": "pw",
     "tipoUsuario": "Socio",
     "puntosFidelidad": 0,
@@ -134,6 +146,7 @@
   {
     "idUsuario": "14",
     "apellido": "Soto",
+    "bonosDescuento": [],
     "contrasena": "pw",
     "tipoUsuario": "Socio",
     "puntosFidelidad": 0,
@@ -145,6 +158,7 @@
   {
     "idUsuario": "15",
     "apellido": "Prada",
+    "bonosDescuento": [],
     "contrasena": "pw",
     "tipoUsuario": "Socio",
     "puntosFidelidad": 0,
@@ -156,6 +170,7 @@
   {
     "idUsuario": "16",
     "apellido": "León",
+    "bonosDescuento": [],
     "contrasena": "pw",
     "tipoUsuario": "Socio",
     "puntosFidelidad": 0,
@@ -167,6 +182,7 @@
   {
     "idUsuario": "17",
     "apellido": "León",
+    "bonosDescuento": [],
     "contrasena": "pw",
     "tipoUsuario": "Socio",
     "puntosFidelidad": 0,
@@ -178,6 +194,7 @@
   {
     "idUsuario": "18",
     "apellido": "León",
+    "bonosDescuento": [],
     "contrasena": "pw",
     "tipoUsuario": "Socio",
     "puntosFidelidad": 0,
@@ -189,6 +206,7 @@
   {
     "idUsuario": "19",
     "apellido": "León",
+    "bonosDescuento": [],
     "contrasena": "pw",
     "tipoUsuario": "Socio",
     "puntosFidelidad": 0,
@@ -259,6 +277,7 @@
   {
     "idUsuario": "7",
     "apellido": "Pérez",
+    "bonosDescuento": [],
     "contrasena": "1234",
     "tipoUsuario": "Socio",
     "puntosFidelidad": 150,
@@ -270,9 +289,10 @@
   {
     "idUsuario": "8",
     "apellido": "Gómez",
+    "bonosDescuento": [],
     "contrasena": "abcd",
     "tipoUsuario": "Socio",
-    "puntosFidelidad": 200,
+    "puntosFidelidad": 7054,
     "login": "agomez",
     "nombre": "Ana",
     "edad": 24,
@@ -281,6 +301,7 @@
   {
     "idUsuario": "9",
     "apellido": "Morales",
+    "bonosDescuento": [],
     "contrasena": "4321",
     "tipoUsuario": "Socio",
     "puntosFidelidad": 0,
@@ -292,6 +313,7 @@
   {
     "idUsuario": "20",
     "apellido": "León",
+    "bonosDescuento": [],
     "contrasena": "pw",
     "tipoUsuario": "Socio",
     "puntosFidelidad": 0,
@@ -303,6 +325,7 @@
   {
     "idUsuario": "21",
     "apellido": "León",
+    "bonosDescuento": [],
     "contrasena": "pw",
     "tipoUsuario": "Socio",
     "puntosFidelidad": 0,

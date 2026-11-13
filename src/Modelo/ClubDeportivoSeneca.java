@@ -1325,6 +1325,15 @@ public class ClubDeportivoSeneca {
         if (primerLugar == null) {
             return;
         }
+        
+        // No se entrega bono si el torneo es competitivo
+        if (torneo.isCompetitivo()) {
+            boolean ganadorEmpleado = usuarios.get(primerLugar) instanceof Empleado;
+            if (!ganadorEmpleado) {
+                torneo.otorgarPremio(primerLugar);
+            }
+            return;
+        }
 
         if (torneo instanceof TorneoConjunto) {
             Equipo equipoGanador = equipos.get(primerLugar);
@@ -1637,7 +1646,24 @@ public class ClubDeportivoSeneca {
         sb.append("Deporte: ").append(seleccionado.getDeporte().getNombreDeporte())
           .append(" | Categoría: ").append(seleccionado.getCategoria())
           .append(" | Estado: ").append(seleccionado.getEstado()).append("\n\n");
-
+        
+        if (seleccionado.isCompetitivo()) {
+            sb.append("Modalidad: Competitivo | Tarifa de inscripción: $").append(Math.round(seleccionado.getTarifaInscripcion()))
+              .append(" | Total recaudado: $").append(Math.round(seleccionado.getTotalRecaudado()));
+            if (Torneo.FINALIZADO.equalsIgnoreCase(seleccionado.getEstado())) {
+                if (seleccionado.getGanadorPremio() == null) {
+                    sb.append(" | Premio: no se otorgó");
+                } else {
+                    sb.append(" | Premio en efectivo: $").append(Math.round(seleccionado.getPremio()));
+                }
+            } else {
+                sb.append(" | Premio estimado: $").append(Math.round(seleccionado.calcularPremio()));
+            }
+            sb.append("\n\n");
+        } else {
+            sb.append("Modalidad: Recreativo (sin costo)\n\n");
+        }
+        
         sb.append("PARTICIPANTES:\n");
         if (seleccionado instanceof TorneoIndividual) {
             for (Usuario p : ((TorneoIndividual) seleccionado).getParticipantesInscritos()) {
@@ -1706,6 +1732,28 @@ public class ClubDeportivoSeneca {
         }
     }
 
+    // ENUNCIADO PROYECTO 2
+    // Diferenciar un torneo competitivo de uno recreativo
+    public TorneoConjunto crearTorneoConjuntoCompetitivo(String idAdministrador, String idTorneo, String nombreTorneo,
+            String nombreDeporte, int categoria, int cuposTotales, double tarifa) {
+		if (tarifa <= 0) {
+		throw new IllegalArgumentException("La tarifa de inscripción debe ser mayor a cero");
+		}
+		TorneoConjunto torneo = crearTorneoConjunto(idAdministrador, idTorneo, nombreTorneo, nombreDeporte, categoria, cuposTotales);
+		torneo.convertirEnCompetitivo(tarifa);
+		return torneo;
+		}
+		
+	public TorneoIndividual crearTorneoIndividualCompetitivo(String idAdministrador, String idTorneo, String nombreTorneo,
+		                String nombreDeporte, int categoria, int cuposTotales, double tarifa) {
+		if (tarifa <= 0) {
+		throw new IllegalArgumentException("La tarifa de inscripción debe ser mayor a cero");
+		}
+		TorneoIndividual torneo = crearTorneoIndividual(idAdministrador, idTorneo, nombreTorneo, nombreDeporte, categoria, cuposTotales);
+		torneo.convertirEnCompetitivo(tarifa);
+		return torneo;
+		}
+    
     // GETTERS
     public Map<String, Usuario> getUsuarios() { return usuarios; }
     public Map<String, Deporte> getDeportes() { return deportes; }

@@ -48,6 +48,15 @@ public class PersistenciaUsuariosJson {
                 int edad = jUsuario.getInt(EDAD);
                 boolean activo = jUsuario.getBoolean(ACTIVO);
                 club.crearSocio(id, nombre, apellido, login, contrasena, puntos, edad, activo);
+                
+                JSONArray jBonos = jUsuario.optJSONArray("bonosDescuento");
+                Usuario creado = club.getUsuarios().get(id);
+                if (jBonos != null && creado instanceof Socio) {
+                    for (int b = 0; b < jBonos.length(); b++) {
+                        ((Socio) creado).agregarBonoDescuento(jBonos.getString(b));
+                    }
+                }
+                
             } else if ("Entrenador".equalsIgnoreCase(tipo)) {
                 String codigo = jUsuario.optString(CODIGO_DESCUENTO, "");
                 club.crearEntrenador(id, nombre, apellido, login, contrasena, puntos, codigo);
@@ -79,6 +88,13 @@ public class PersistenciaUsuariosJson {
                     jUsuario.put(TIPO_USUARIO, "Socio");
                     jUsuario.put(EDAD, s.getEdad());
                     jUsuario.put(ACTIVO, s.isActivo());
+                    
+                    JSONArray jBonos = new JSONArray();
+                    for (String bono : s.getBonosDescuento()) {
+                        jBonos.put(bono);
+                    }
+                    jUsuario.put("bonosDescuento", jBonos);
+                    
                 } else if (usuario instanceof Entrenador) {
                     jUsuario.put(TIPO_USUARIO, "Entrenador");
                     jUsuario.put(CODIGO_DESCUENTO, ((Empleado) usuario).getCodigoDescuento());

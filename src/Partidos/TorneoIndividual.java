@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import Deportes.Deporte;
 import Usuarios.Usuario;
+import Usuarios.Empleado;
 
 public class TorneoIndividual extends Torneo {
     private List<Usuario> participantesInscritos;
@@ -18,7 +19,11 @@ public class TorneoIndividual extends Torneo {
         this.idsCupoPreferencial = new HashSet<>();
         this.idsCupoGeneral = new HashSet<>();
     }
-
+    
+    public Set<String> getIdsCupoGeneral() { 
+    	return idsCupoGeneral; 
+    }
+    
     public boolean estaParticipanteInscrito(Usuario usuario) {
         return usuario != null && participantesInscritos.contains(usuario);
     }
@@ -39,6 +44,11 @@ public class TorneoIndividual extends Torneo {
         }
         participantesInscritos.add(usuario);
         tablaPosiciones.put(usuario.getIdUsuario(), 0);
+        
+        if (!(usuario instanceof Empleado)) {
+            cobrarInscripcion();
+        }
+        
     }
 
     public void desinscribirParticipante(Usuario usuario, boolean liberarPreferencial) {
@@ -51,6 +61,11 @@ public class TorneoIndividual extends Torneo {
         } else {
             cuposGenerales++;
         }
+        
+        if (!(usuario instanceof Empleado)) {
+            reembolsarInscripcion();
+        }
+        
     }
 
     public boolean usoCupoPreferencial(String idUsuario) {
