@@ -114,13 +114,17 @@ public class Tienda {
         return venta;
     }
 
-    private void registrarVenta(Venta venta) {
+private void registrarVenta(Venta venta) {
         Usuario usuario = venta.getUsuario();
         usuario.sumarPuntos((int) venta.getPuntosGanados());
         usuario.agregarVenta(venta);
         agregarVenta(venta);
         for (ItemVenta item : venta.getItemsVenta()) {
             item.quitarProductoInventario();
+        }
+        if (venta.isBonoAplicado() && venta.getCodigoBonoAplicado() != null && usuario instanceof Socio) {
+            ((Socio) usuario).usarBonoDescuento(venta.getCodigoBonoAplicado());
+            this.calculadoraDescuento.consumirBonoTorneo(venta.getCodigoBonoAplicado());
         }
     }
 
@@ -348,5 +352,37 @@ public class Tienda {
 
     public void setCalculadoraDescuento(CalculadoraDescuento calculadoraDescuento) {
         this.calculadoraDescuento = calculadoraDescuento;
+    }
+    public void registrarBonoTorneo(String codigoBono) {
+        this.calculadoraDescuento.agregarBonoTorneoValido(codigoBono);
+    }
+
+    public List<String> getBonosValidos() {
+        return this.calculadoraDescuento.getBonosTorneoValidos();
+    }
+
+    // HU-06: Inicia una compra en progreso en la tienda deportiva
+    public Venta iniciarCompraTienda(String idVenta, String fecha, int hora, String idUsuario,
+                                     List<ItemVenta> itemsVenta, ClubDeportivoSeneca clubDeportivo) {
+        return armarVenta(idVenta, fecha, hora, idUsuario, "", itemsVenta, clubDeportivo, Venta.TIENDADEPORTIVA);
+    }
+
+    // HU-06 CA-1, CA-2, CA-3, CA-4: Aplica un bono de descuento a una compra en progreso
+    public void aplicarBonoDescuento(Venta ventaEnProgreso, String codigoBono) {
+        if (ventaEnProgreso == null) {
+            throw new IllegalArgumentException("No hay una compra en progreso");
+        }
+        if (!Venta.TIENDADEPORTIVA.equalsIgnoreCase(ventaEnProgreso.getTipo())) {
+            throw new IllegalArgumentException("Los bonos solo aplican en la tienda deportiva");
+        }
+        ventaEnProgreso.aplicarBonoDescuento(codigoBono, this.calculadoraDescuento);
+    }
+
+    // Confirma la compra en progreso y consume el bono aplicado
+    public void confirmarCompraTienda(Venta ventaEnProgreso) {
+        if (ventaEnProgreso == null) {
+            throw new IllegalArgumentException("No hay una compra en progreso");
+        }
+        registrarVenta(ventaEnProgreso);
     }
 }

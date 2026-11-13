@@ -22,6 +22,7 @@ public class Socio extends Usuario {
 	private Map<String, Reserva> reservas;
 	private List<AsistenciaEvaluacion> asistenciaEvaluaciones;
 	private List<Estadistica> estadisticas;
+	private List<String> bonosDescuento;
 	
 
 	public Socio(String idUsuario, String nombre, String apellido, String login, String contraseña,
@@ -36,6 +37,7 @@ public class Socio extends Usuario {
 		this.reservas = new HashMap<>();
 		this.asistenciaEvaluaciones = new ArrayList<>();
 		this.estadisticas = new ArrayList<>();
+		this.bonosDescuento = new ArrayList<>();
 	}
 	
 	public boolean tieneReservaActiva() {
@@ -146,5 +148,29 @@ public class Socio extends Usuario {
 	public boolean sePuedeCrearInscripcionEquipo(Equipo equipo) {
 		return motivoNoPuedeInscribirse(equipo) == null;
 	}
+	public List<String> getBonosDescuento() {
+        return bonosDescuento;
+    }
+
+    public void agregarBonoDescuento(String codigoBono) {
+        if (codigoBono != null && !codigoBono.trim().isEmpty() && !this.bonosDescuento.contains(codigoBono.trim())) {
+            this.bonosDescuento.add(codigoBono.trim());
+        }
+    }
+
+    public boolean tieneBonosDisponibles() {
+        return this.bonosDescuento != null && !this.bonosDescuento.isEmpty();
+    }
+
+    public boolean tieneBonoDescuento(String codigoBono) {
+        return codigoBono != null && this.bonosDescuento != null && this.bonosDescuento.contains(codigoBono.trim());
+    }
+
+    public boolean usarBonoDescuento(String codigoBono) {
+        if (codigoBono != null && this.bonosDescuento != null) {
+            return this.bonosDescuento.remove(codigoBono.trim());
+        }
+        return false;
+    }
 }
 
