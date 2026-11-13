@@ -169,7 +169,21 @@ public class Equipo {
         }
         return !inscripcion.isEstaSuspendido();
     }
-
+    
+	public String motivoNoDisponible(Socio socio) {
+		if(!socio.isActivo()) {
+			return "inactivo";
+		}
+		InscripcionEquipo inscripcion = getInscripcionDe(socio);
+		if(inscripcion == null) {
+			return "no pertenece al equipo";
+		}
+		if(inscripcion.isEstaSuspendido()) {
+			return "suspendido";
+		}
+		return null;
+	}
+	
     public int contarJugadoresHabilitados() {
         int habilitados = 0;
         for (Socio socio : this.socios) {

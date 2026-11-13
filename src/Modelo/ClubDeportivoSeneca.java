@@ -250,7 +250,7 @@ public class ClubDeportivoSeneca {
             throw new IllegalArgumentException("La posición no es válida para el deporte");
         }
         if (!equipo.esCamisetaDisponible(numeroCamiseta)) {
-            throw new IllegalArgumentException("La camiseta " + numeroCamiseta + " no está disponible");
+            throw new IllegalArgumentException("La camiseta " + numeroCamiseta + " ya fue asignada a otro jugador del equipo. Elija un número de camiseta libre");
         }
         crearInscripcionEquipo(idSocio, nombreEquipo, posicion, numeroCamiseta, 0);
     }
@@ -283,6 +283,26 @@ public class ClubDeportivoSeneca {
         Instalacion instalacion = new Instalacion(nombre, tipo, esTechada, capacidadMaximaJugadores);
         agregarInstalacion(instalacion);
     }
+    
+    public void crearInstalacion(String nombre, String tipo, boolean esTechada, int capacidadMaximaJugadores, String nombreDeporte) {
+        crearInstalacion(nombre, tipo, esTechada, capacidadMaximaJugadores);
+        Instalacion instalacion = instalaciones.get(nombre);
+        Deporte deporte = deportes.get(nombreDeporte);
+        if (instalacion != null && deporte != null) {
+            instalacion.setDeporte(deporte);
+        }
+    }
+
+    public void definirMaximoInstalacionesSimultaneas(String nombreDeporte, int maximo) {
+        Deporte deporte = deportes.get(nombreDeporte);
+        if (deporte == null) {
+            throw new IllegalArgumentException("El deporte no existe");
+        }
+        if (maximo < 0) {
+            throw new IllegalArgumentException("El máximo no puede ser negativo (0 significa sin límite)");
+        }
+        deporte.setMaxInstalacionesSimultaneas(maximo);
+    }
 
     public void nuevosHorarios(String nombreInstalacion, String fecha, int horaInicio, int horaFin) {
         Instalacion instalacion = instalaciones.get(nombreInstalacion);
@@ -307,6 +327,33 @@ public class ClubDeportivoSeneca {
     }
 
     // PARTIDOS
+    
+    // HU-ENT-02: informa si el equipo alcanza el mínimo de jugadores habilitados y lista a los no disponibles.
+    public List<String> consultarDisponibilidadEquipo(String nombreEquipo) {
+        Equipo equipo = equipos.get(nombreEquipo);
+        if (equipo == null) {
+            throw new IllegalArgumentException("El equipo no existe");
+        }
+        List<String> lineas = new ArrayList<>();
+        int habilitados = equipo.contarJugadoresHabilitados();
+        int minimo = equipo.getDeporteEquipo().getMinJugadores();
+        if (equipo.cumpleMinimoJugadores()) {
+            lineas.add("El equipo puede disputar el partido: tiene " + habilitados
+                    + " jugadores habilitados (mínimo " + minimo + ").");
+        } else {
+            lineas.add("El equipo NO puede disputar el partido: tiene " + habilitados
+                    + " jugadores habilitados y el mínimo es " + minimo + ".");
+        }
+        for (Socio socio : equipo.getSocios()) {
+            String motivo = equipo.motivoNoDisponible(socio);
+            if (motivo != null) {
+                lineas.add("No disponible: " + socio.getNombre() + " " + socio.getApellido()
+                        + " (" + socio.getIdUsuario() + ") - " + motivo);
+            }
+        }
+        return lineas;
+    }
+    
     public void crearPartidoCompetencia(String idPartido, String fecha, String marcadorFinal, String estadoPartido, String nombreEquipo, String institucionRival, String escenario) {
         Equipo equipo = equipos.get(nombreEquipo);
         if (equipo != null) {
@@ -1051,7 +1098,15 @@ public class ClubDeportivoSeneca {
             throw new IllegalArgumentException("Ese horario no existe para la instalación");
         }
         if (!instalacion.sePuedeCrearReserva(fecha, hora)) {
-            throw new IllegalArgumentException("Ese horario ya está reservado");
+            throw new IllegalArgumentException(mensajeSinDisponibilidad(instalacion, fecha, hora));
+        }
+        Deporte deporte = instalacion.getDeporte();
+        if (deporte != null && deporte.getMaxInstalacionesSimultaneas() > 0) {
+            int maximo = deporte.getMaxInstalacionesSimultaneas();
+            if (contarReservasSimultaneas(deporte, fecha, hora) >= maximo) {
+                throw new IllegalArgumentException("No hay disponibilidad: ya están ocupadas las " + maximo
+                        + " instalaciones simultáneas permitidas para " + deporte.getNombreDeporte() + " en ese bloque horario");
+            }
         }
         if (cantidadJugadores <= 0 || cantidadJugadores > instalacion.getCapacidadMaximaJugadores()) {
             throw new IllegalArgumentException("La cantidad de jugadores debe estar entre 1 y " + instalacion.getCapacidadMaximaJugadores());
@@ -1059,7 +1114,68 @@ public class ClubDeportivoSeneca {
         if (modalidad == null || modalidad.trim().isEmpty()) {
             throw new IllegalArgumentException("Debe indicar la modalidad");
         }
+        if (instalacion.esPadel() && !(cantidadJugadores == 4 && "Dobles".equalsIgnoreCase(modalidad.trim()))) {
+            throw new IllegalArgumentException("El pádel siempre se juega en modalidad de dobles (4 jugadores)");
+        }
         crearReserva(idReserva, idSocio, nombreInstalacion, fecha, hora, cantidadJugadores, modalidad);
+    }
+    
+    // HU-JUG-01 CA-3: el socio ingresa a una instalación que reservó. No se permite usar una cancha de pádel
+    // o una mesa de tenis de mesa techada con una bebida caliente.
+    public void ingresarAInstalacion(String idSocio, String idReserva, boolean llevaBebidaCaliente) {
+        Usuario usuario = usuarios.get(idSocio);
+        if (!(usuario instanceof Socio)) {
+            throw new IllegalArgumentException("El socio no existe");
+        }
+        Reserva reserva = reservas.get(idReserva);
+        if (reserva == null) {
+            throw new IllegalArgumentException("La reserva no existe");
+        }
+        if (reserva.getSocio() != usuario) {
+            throw new IllegalArgumentException("La reserva no pertenece a este socio");
+        }
+        Instalacion instalacion = reserva.getInstalacion();
+        if (llevaBebidaCaliente && instalacion.esPadelOTenisDeMesaTechada()) {
+            throw new IllegalArgumentException("por seguridad no se permite el uso de una cancha de pádel o una mesa de tenis de mesa techada con una bebida caliente");
+        }
+    }
+
+    // Reservas de una misma disciplina en un mismo bloque horario (cuentan contra el máximo simultaneo).
+    private int contarReservasSimultaneas(Deporte deporte, String fecha, String hora) {
+        int total = 0;
+        for (Reserva reserva : reservas.values()) {
+            Instalacion instalacion = reserva.getInstalacion();
+            if (instalacion != null && instalacion.getDeporte() == deporte
+                    && reserva.getFecha().equals(fecha) && reserva.getHoraInicio().equals(hora)) {
+                total++;
+            }
+        }
+        return total;
+    }
+
+    // Devuelve -1 si la disciplina no tiene límite; si lo tiene retorna cuantas reservas simultáneas más le caben.
+    public int cuposSimultaneosLibres(Deporte deporte, String fecha, String hora) {
+        int maximo = deporte.getMaxInstalacionesSimultaneas();
+        if (maximo <= 0) {
+            return -1;
+        }
+        return maximo - contarReservasSimultaneas(deporte, fecha, hora);
+    }
+
+    private String mensajeSinDisponibilidad(Instalacion instalacion, String fecha, String hora) {
+        Deporte deporte = instalacion.getDeporte();
+        List<String> libres = new ArrayList<>();
+        if (deporte != null) {
+            for (Instalacion otra : instalaciones.values()) {
+                if (otra != instalacion && otra.getDeporte() == deporte && otra.sePuedeCrearReserva(fecha, hora)) {
+                    libres.add(otra.getNombre());
+                }
+            }
+        }
+        if (libres.isEmpty()) {
+            return "No hay disponibilidad: todas las instalaciones de la disciplina están ocupadas en ese bloque horario";
+        }
+        return "Esa instalación ya está reservada en ese bloque horario. Instalaciones libres de la disciplina: " + String.join(", ", libres);
     }
 
     public String generarIdSesionEntrenamiento() {

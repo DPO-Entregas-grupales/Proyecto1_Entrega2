@@ -39,6 +39,7 @@ import Partidos.TorneoConjunto;
 import Partidos.TorneoIndividual;
 import Tienda.CalculadoraDescuento;
 import Usuarios.Invitado;
+import ReservasInstalaciones.Reserva;
 
 public class Consola {
 
@@ -337,6 +338,7 @@ public class Consola {
         System.out.println("\n--- INSTALACIONES ---");
         System.out.println("1. Registrar Instalación");
         System.out.println("2. Generar Horarios");
+        System.out.println("3. Definir el máximo de instalaciones simultáneas de un deporte");
         System.out.println("0. Volver");
 
         int op = leerEntero("Opción: ");
@@ -346,7 +348,12 @@ public class Consola {
                 String tipo = leerTexto("Tipo: ");
                 boolean techada = leerTexto("¿Techada? (s/n): ").equalsIgnoreCase("s");
                 int cap = leerEntero("Capacidad: ");
-                club.crearInstalacion(nombre, tipo, techada, cap);
+                String deporte = leerTexto("Deporte de la instalación (por ejemplo Tenis o Pádel): ");
+                if (club.getDeportes().get(deporte) == null) {
+                    System.out.println("El deporte no existe.");
+                    return;
+                }
+                club.crearInstalacion(nombre, tipo, techada, cap, deporte);
                 guardarTodo();
                 System.out.println("Instalación creada.");
             }
@@ -358,6 +365,22 @@ public class Consola {
                 club.nuevosHorarios(nombre, fecha, hInicio, hFin);
                 guardarTodo();
                 System.out.println("Horarios agregados.");
+            }
+            case 3 -> {
+                System.out.println("Deportes:");
+                for (Deporte d : club.getDeportes().values()) {
+                    System.out.println("- " + d.getNombreDeporte() + " | máximo actual: " + d.getMaxInstalacionesSimultaneas()
+                            + " (0 = sin límite)");
+                }
+                String deporte = leerTexto("Deporte: ");
+                int maximo = leerEntero("Máximo de instalaciones simultáneas (0 = sin límite): ");
+                try {
+                    club.definirMaximoInstalacionesSimultaneas(deporte, maximo);
+                    guardarTodo();
+                    System.out.println("Máximo actualizado.");
+                } catch (IllegalArgumentException e) {
+                    System.out.println("No se pudo definir el máximo: " + e.getMessage());
+                }
             }
         }
     }
@@ -458,6 +481,7 @@ public class Consola {
         System.out.println("5. Comprar en la cafetería");
         System.out.println("6. Torneos");
         System.out.println("7. Comprar en la tienda deportiva con un bono");
+        System.out.println("8. Ingresar a una instalación reservada");
         System.out.println("9. Cerrar sesión");
         System.out.println("0. Salir de la aplicación");
 
@@ -470,6 +494,7 @@ public class Consola {
             case 5 -> comprar(Venta.CAFETERIA);
             case 6 -> menuTorneosSocio();
             case 7 -> comprarConBono();
+            case 8 -> ingresarAInstalacionReservada();
             case 9 -> cerrarSesion();
             case 0 -> salir();
             default -> System.out.println("Opción no válida.");
@@ -636,7 +661,9 @@ public class Consola {
         try {
             club.realizarInscripcionEquipo(usuarioAutenticado.getIdUsuario(), equipo, posicion, numero);
             guardarTodo();
-            System.out.println("Inscripción de equipo registrada.");
+            Equipo elegido = club.getEquipos().get(equipo);
+            System.out.println("Inscripción registrada: dorsal " + numero + ", posición " + posicion
+                    + ". Cupos libres en el equipo: " + (elegido.getCupoMaximo() - elegido.getSocios().size()) + ".");
         } catch (IllegalArgumentException e) {
             System.out.println("No se pudo realizar la inscripción: " + e.getMessage());
         }
@@ -645,9 +672,16 @@ public class Consola {
     private void reservarInstalacion() {
         System.out.println("\n--- RESERVA DE INSTALACIÓN ---");
         System.out.println("Instalaciones:");
+        
         for (Instalacion i : club.getInstalaciones().values()) {
-            System.out.println("- " + i.getNombre() + " | " + i.getTipo() + " | capacidad: " + i.getCapacidadMaximaJugadores());
+            String nombreDeporte = "sin disciplina";
+            if (i.getDeporte() != null) {
+                nombreDeporte = i.getDeporte().getNombreDeporte();
+            }
+            System.out.println("- " + i.getNombre() + " | " + i.getTipo() + " | " + nombreDeporte
+                    + " | capacidad: " + i.getCapacidadMaximaJugadores());
         }
+        
         String idReserva = String.valueOf(contadorReservas);
         String inst = leerTexto("Instalación: ");
         String fecha = leerTexto("Fecha (YYYY-MM-DD): ");
@@ -659,6 +693,16 @@ public class Consola {
             contadorReservas++;
             guardarTodo();
             System.out.println("Reserva realizada (ID: " + idReserva + ").");
+            
+            Instalacion elegida = club.getInstalaciones().get(inst);
+            if (elegida.getDeporte() != null) {
+                int libres = club.cuposSimultaneosLibres(elegida.getDeporte(), fecha, hora);
+                if (libres >= 0) {
+                    System.out.println("Cupos simultáneos libres de " + elegida.getDeporte().getNombreDeporte()
+                            + " en ese bloque: " + libres + ".");
+                }
+            }
+            
         } catch (IllegalArgumentException e) {
             System.out.println("No se pudo realizar la reserva: " + e.getMessage());
         }
@@ -675,6 +719,7 @@ public class Consola {
         System.out.println("6. Comprar en la tienda deportiva");
         System.out.println("7. Comprar en la cafetería");
         System.out.println("8. Torneos");
+        System.out.println("10. Consultar si un equipo puede jugar");
         System.out.println("9. Cerrar sesión");
         System.out.println("0. Salir de la aplicación");
 
@@ -689,6 +734,7 @@ public class Consola {
             case 7 -> comprar(Venta.CAFETERIA);
             case 8 -> menuTorneosEntrenador();
             case 9 -> cerrarSesion();
+            case 10 -> consultarDisponibilidadEquipo();
             case 0 -> salir();
             default -> System.out.println("Opción no válida.");
         }
@@ -1952,6 +1998,48 @@ public class Consola {
             System.out.println("Se eliminó la inscripción y se liberó el cupo.");
         } catch (IllegalArgumentException e) {
             System.out.println("No se pudo retirar al invitado: " + e.getMessage());
+        }
+    }
+    
+    private void consultarDisponibilidadEquipo() {
+        System.out.println("\n--- DISPONIBILIDAD DE UN EQUIPO ---");
+        System.out.println("Equipos del club:");
+        for (Equipo e : club.getEquipos().values()) {
+            System.out.println("- " + e.getNombreEquipo() + " | " + e.getDeporteEquipo().getNombreDeporte()
+                    + " | habilitados: " + e.contarJugadoresHabilitados() + " de " + e.getSocios().size());
+        }
+        String nombre = leerTexto("Nombre del equipo: ");
+        try {
+            for (String linea : club.consultarDisponibilidadEquipo(nombre)) {
+                System.out.println(linea);
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("No se pudo consultar: " + e.getMessage());
+        }
+    }
+    
+    private void ingresarAInstalacionReservada() {
+        System.out.println("\n--- INGRESAR A UNA INSTALACIÓN RESERVADA ---");
+        System.out.println("Sus reservas:");
+        boolean hay = false;
+        for (Reserva r : club.getReservas().values()) {
+            if (r.getSocio() == usuarioAutenticado) {
+                hay = true;
+                System.out.println("- ID " + r.getIdReserva() + " | " + r.getInstalacion().getNombre()
+                        + " | " + r.getFecha() + " " + r.getHoraInicio() + "h");
+            }
+        }
+        if (!hay) {
+            System.out.println("No tiene reservas.");
+            return;
+        }
+        String idReserva = leerTexto("ID de la reserva: ");
+        boolean lleva = leerTexto("¿Lleva consigo una bebida caliente? (s/n): ").equalsIgnoreCase("s");
+        try {
+            club.ingresarAInstalacion(usuarioAutenticado.getIdUsuario(), idReserva, lleva);
+            System.out.println("Ingreso permitido. ¡Buen juego!");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Ingreso denegado: " + e.getMessage());
         }
     }
     

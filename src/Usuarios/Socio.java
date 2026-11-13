@@ -134,10 +134,10 @@ public class Socio extends Usuario {
 			return "El socio está inactivo";
 		}
 		if(!esDeporteNoInscrito(equipo.getDeporteEquipo())) {
-			return "El socio ya pertenece a un equipo de ese deporte";
+			return "El socio ya pertenece a un equipo de ese deporte: solo puede pertenecer a un único equipo por disciplina";
 		}
 		if(this.edad > equipo.getCategoriaEdad()) {
-			return "La edad del socio no corresponde a la categoría del equipo";
+			return "Incompatibilidad de categoría: la edad del socio no corresponde a la categoría del equipo";
 		}
 		if(!equipo.tieneCupo()) {
 			return "El equipo no tiene cupo";

@@ -1,5 +1,7 @@
 package ReservasInstalaciones;
 
+import Deportes.Deporte;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,8 +10,11 @@ public class Instalacion {
     private String tipo;
     private boolean esTechado;
     private int capacidadMaximaJugadores;
-    // Mapa que almacena Key: "YYYY-MM-DD_HORA", Value: Boolean (true si está disponible, false si está ocupado)
+    private Deporte deporte;
+    
+    // Mapa que guarda Key: "YYYY-MM-DD_HORA", Value: Boolean (true si está disponible, false si está ocupado)
     private Map<String, Boolean> horarios;
+    
 
     public Instalacion(String nombre, String tipo, boolean esTechado, int capacidadMaximaJugadores) {
         this.nombre = nombre;
@@ -58,6 +63,17 @@ public class Instalacion {
         return texto.contains("pádel") || texto.contains("padel") || texto.contains("tenis de mesa");
     }
     
+    public boolean esPadel() {
+        String texto = "";
+        if (deporte != null) {
+            texto = deporte.getNombreDeporte();
+        } else if (tipo != null) {
+            texto = tipo;
+        }
+        texto = texto.toLowerCase();
+        return texto.contains("pádel") || texto.contains("padel");
+    }
+    
     // Getters y Setters
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
@@ -70,4 +86,11 @@ public class Instalacion {
 
     public int getCapacidadMaximaJugadores() { return capacidadMaximaJugadores; }
     public void setCapacidadMaximaJugadores(int capacidadMaximaJugadores) { this.capacidadMaximaJugadores = capacidadMaximaJugadores; }
+    
+    public Deporte getDeporte() {
+        return deporte;
+    }
+    public void setDeporte(Deporte deporte) {
+        this.deporte = deporte;
+    }
 }

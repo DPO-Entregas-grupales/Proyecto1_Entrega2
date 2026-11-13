@@ -11,6 +11,7 @@ public class Deporte {
 	private int puntosVictoria;
 	private int puntosDerrota;
 	private int puntosEmpate;
+	private int maxInstalacionesSimultaneas;
 	
 	public Deporte(String nombreDeporte, int minJugadores,List<String> posiciones ,boolean permiteEmpate, int puntosVictoria, int puntosDerrota,
 			int puntosEmpate) {
@@ -74,5 +75,12 @@ public class Deporte {
 		return this.minJugadores <= 1;
 	}
 	
+	public int getMaxInstalacionesSimultaneas() {
+		return maxInstalacionesSimultaneas;
+	}
+	
+	public void setMaxInstalacionesSimultaneas(int maxInstalacionesSimultaneas) {
+		this.maxInstalacionesSimultaneas = maxInstalacionesSimultaneas;
+	}
 	
 }

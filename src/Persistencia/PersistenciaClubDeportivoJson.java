@@ -112,6 +112,10 @@ public class PersistenciaClubDeportivoJson {
             }
 
             club.crearDeporte(nombre, minJugadores, posiciones, permiteEmpate, pVictoria, pDerrota, pEmpate);
+            Deporte creado = club.getDeportes().get(nombre);
+            if (creado != null) {
+                creado.setMaxInstalacionesSimultaneas(jDeporte.optInt("maxInstalacionesSimultaneas", 0));
+            }
         }
     }
 
@@ -193,6 +197,11 @@ public class PersistenciaClubDeportivoJson {
 
             club.crearInstalacion(nombre, tipo, esTechada, capacidad);
             Instalacion instalacion = club.getInstalaciones().get(nombre);
+            
+            String nombreDeporteInstalacion = jObj.optString("nombreDeporte", "");
+            if (instalacion != null && !nombreDeporteInstalacion.isEmpty()) {
+                instalacion.setDeporte(club.getDeportes().get(nombreDeporteInstalacion));
+            }
 
             if (instalacion != null && jObj.has("horarios")) {
                 JSONArray jHorarios = jObj.getJSONArray("horarios");
@@ -392,6 +401,7 @@ public class PersistenciaClubDeportivoJson {
             jDep.put("puntosDerrota", dep.getPuntosDerrota());
             jDep.put("puntosEmpate", dep.getPuntosEmpate());
             jDep.put("posiciones", new JSONArray(dep.getPosiciones()));
+            jDep.put("maxInstalacionesSimultaneas", dep.getMaxInstalacionesSimultaneas());
             jDeportes.put(jDep);
         }
         raiz.put(DEPORTES, jDeportes);
@@ -476,7 +486,11 @@ public class PersistenciaClubDeportivoJson {
             jObj.put("tipo", inst.getTipo());
             jObj.put("esTechada", inst.isEsTechado());
             jObj.put("capacidadMaximaJugadores", inst.getCapacidadMaximaJugadores());
-
+            
+            if (inst.getDeporte() != null) {
+                jObj.put("nombreDeporte", inst.getDeporte().getNombreDeporte());
+            }
+            
             JSONArray jHorarios = new JSONArray();
             if (inst.getHorarios() != null) {
                 for (Map.Entry<String, Boolean> entry : inst.getHorarios().entrySet()) {
