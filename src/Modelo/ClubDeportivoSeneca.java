@@ -13,6 +13,7 @@ import Usuarios.Fisioterapeuta;
 import Usuarios.Socio;
 import Usuarios.Usuario;
 import Usuarios.Empleado;
+import Usuarios.Invitado;
 import Deportes.Deporte;
 import Deportes.Equipo;
 import Deportes.Competencia;
@@ -1753,6 +1754,65 @@ public class ClubDeportivoSeneca {
 		torneo.convertirEnCompetitivo(tarifa);
 		return torneo;
 		}
+    
+    // Un empleado o un invitado se sale de un torneo individual: se libera un cupo general
+    // y en un torneo competitivo, se descuenta la tarifa (los empleados no pagan).
+    public void desinscribirParticipanteTorneoIndividual(String idUsuario, String idTorneo) {
+        Usuario usuario = usuarios.get(idUsuario);
+        if (!(usuario instanceof Empleado) && !(usuario instanceof Invitado)) {
+            throw new IllegalArgumentException("Esta opción solo aplica a empleados e invitados");
+        }
+        Torneo t = torneos.get(idTorneo);
+        if (!(t instanceof TorneoIndividual)) {
+            throw new IllegalArgumentException("El torneo individual no existe");
+        }
+        TorneoIndividual torneo = (TorneoIndividual) t;
+        if (!Torneo.EN_CURSO.equalsIgnoreCase(torneo.getEstado())) {
+            throw new IllegalArgumentException("El torneo ya ha finalizado");
+        }
+        if (!torneo.estaParticipanteInscrito(usuario)) {
+            throw new IllegalArgumentException("No está inscrito en el torneo");
+        }
+        torneo.desinscribirParticipante(usuario, false);
+    }
+    
+    // METODOS QUE GESTIONAN A LOS INVITADOS
+    
+    public void crearInvitado(String idUsuario, String nombre, String apellido, int edad) {
+        Invitado invitado = new Invitado(idUsuario, nombre, apellido, "invitado-" + idUsuario, "", 0, edad);
+        agregarUsuario(invitado);
+    }
+
+    // El administrador inscribe a un invitado (estudiante o persona externa) en un torneo individual.
+    public void inscribirInvitadoTorneoIndividual(String idAdministrador, String idInvitado, String idTorneo) {
+        Usuario admin = usuarios.get(idAdministrador);
+        if (!(admin instanceof Administrador)) {
+            throw new IllegalArgumentException("Solo un administrador puede inscribir invitados");
+        }
+        Usuario usuario = usuarios.get(idInvitado);
+        if (!(usuario instanceof Invitado)) {
+            throw new IllegalArgumentException("El invitado no existe");
+        }
+        Invitado invitado = (Invitado) usuario;
+        Torneo t = torneos.get(idTorneo);
+        if (!(t instanceof TorneoIndividual)) {
+            throw new IllegalArgumentException("El torneo individual no existe");
+        }
+        TorneoIndividual torneo = (TorneoIndividual) t;
+        if (!Torneo.EN_CURSO.equalsIgnoreCase(torneo.getEstado())) {
+            throw new IllegalArgumentException("El torneo ya ha finalizado");
+        }
+        if (torneo.estaParticipanteInscrito(invitado)) {
+            throw new IllegalArgumentException("El invitado ya se encuentra inscrito en el torneo");
+        }
+        if (torneo.getCategoria() > 0 && invitado.getEdad() > torneo.getCategoria()) {
+            throw new IllegalArgumentException("El invitado no cumple con la categoría del torneo");
+        }
+        if (torneo.getCuposGenerales() <= 0) {
+            throw new IllegalArgumentException("No quedan cupos generales disponibles en el torneo");
+        }
+        torneo.inscribirParticipante(invitado, false);
+    }
     
     // GETTERS
     public Map<String, Usuario> getUsuarios() { return usuarios; }

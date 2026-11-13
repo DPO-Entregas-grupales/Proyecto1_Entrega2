@@ -38,6 +38,7 @@ import Partidos.Torneo;
 import Partidos.TorneoConjunto;
 import Partidos.TorneoIndividual;
 import Tienda.CalculadoraDescuento;
+import Usuarios.Invitado;
 
 public class Consola {
 
@@ -116,8 +117,9 @@ public class Consola {
 
                 List<Usuario> listaUsuarios = new ArrayList<>(club.getUsuarios().values());
                 Usuario u = autentificador.autenticar(login, pass, listaUsuarios);
-
-                if (u != null && u instanceof Socio && !((Socio) u).isActivo()) {
+                if (u instanceof Invitado) {
+                    System.out.println("Los invitados no tienen acceso al sistema.");
+                } else if (u != null && u instanceof Socio && !((Socio) u).isActivo()) {
                     System.out.println("Su cuenta está dada de baja.");
                 } else if (u != null) {
                     this.usuarioAutenticado = u;
@@ -1441,6 +1443,8 @@ public class Consola {
         System.out.println("3. Ver torneos");
         System.out.println("4. Registrar un partido de torneo");
         System.out.println("5. Finalizar un torneo");
+        System.out.println("6. Inscribir un invitado en un torneo individual");
+        System.out.println("7. Retirar a un invitado de un torneo individual");
         System.out.println("0. Volver");
 
         int op = leerEntero("Opción: ");
@@ -1454,6 +1458,8 @@ public class Consola {
             }
             case 4 -> registrarPartidoTorneo();
             case 5 -> finalizarTorneo();
+            case 6 -> registrarInvitadoEnTorneo();
+            case 7 -> retirarInvitadoDeTorneo();
             case 0 -> { }
             default -> System.out.println("Opción no válida.");
         }
@@ -1753,6 +1759,7 @@ public class Consola {
         System.out.println("2. Inscribir un equipo en un torneo de equipos");
         System.out.println("3. Inscribirme a un torneo individual");
         System.out.println("4. Ver historial de mis torneos");
+        System.out.println("5. Salirme de un torneo individual");
         System.out.println("0. Volver");
 
         int op = leerEntero("Opción: ");
@@ -1765,6 +1772,7 @@ public class Consola {
             case 2 -> inscribirEquipoATorneo();
             case 3 -> inscribirseComoEmpleadoATorneo();
             case 4 -> consultarHistorialTorneos();
+            case 5 -> salirseComoEmpleadoDeTorneo();
             case 0 -> { }
             default -> System.out.println("Opción no válida.");
         }
@@ -1775,6 +1783,7 @@ public class Consola {
         System.out.println("1. Ver torneos");
         System.out.println("2. Inscribirme a un torneo individual");
         System.out.println("3. Ver historial de mis torneos");
+        System.out.println("4. Salirme de un torneo individual");
         System.out.println("0. Volver");
 
         int op = leerEntero("Opción: ");
@@ -1786,6 +1795,7 @@ public class Consola {
             }
             case 2 -> inscribirseComoEmpleadoATorneo();
             case 3 -> consultarHistorialTorneos();
+            case 4 -> salirseComoEmpleadoDeTorneo();
             case 0 -> { }
             default -> System.out.println("Opción no válida.");
         }
@@ -1856,6 +1866,23 @@ public class Consola {
         }
     }
     
+    private void salirseComoEmpleadoDeTorneo() {
+        System.out.println("\n--- SALIRSE DE UN TORNEO INDIVIDUAL ---");
+        System.out.println("Torneos individuales en curso:");
+        if (!imprimirTorneosIndividualesEnCurso()) {
+            System.out.println("No hay torneos individuales en curso.");
+            return;
+        }
+        String idTorneo = leerTexto("ID del torneo: ");
+        try {
+            club.desinscribirParticipanteTorneoIndividual(usuarioAutenticado.getIdUsuario(), idTorneo);
+            guardarTodo();
+            System.out.println("Se eliminó su inscripción y se liberó el cupo.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("No se pudo cancelar la inscripción: " + e.getMessage());
+        }
+    }
+    
     // COMPARTIDO para Socios, Entrenadores y Fisios
     // Historial detallado de los torneos en los que participa el usuario autenticado (HU-05).
     private void consultarHistorialTorneos() {
@@ -1871,6 +1898,60 @@ public class Consola {
             System.out.println(club.consultarHistorialTorneo(idUsuario, idTorneo));
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
+        }
+    }
+    
+    // METODOS PARA GESTIONAR INVITADOS
+    private void registrarInvitadoEnTorneo() {
+        System.out.println("\n--- INSCRIBIR UN INVITADO EN UN TORNEO ---");
+        System.out.println("Torneos individuales en curso:");
+        if (!imprimirTorneosIndividualesEnCurso()) {
+            System.out.println("No hay torneos individuales en curso.");
+            return;
+        }
+        String idTorneo = leerTexto("ID del torneo: ");
+        String idInvitado = leerTexto("ID del invitado (Enter para crear uno nuevo): ");
+        boolean nuevo = false;
+        if (idInvitado.isEmpty()) {
+            idInvitado = String.valueOf(contadorUsuarios);
+            String nombre = leerTexto("Nombre: ");
+            String apellido = leerTexto("Apellido: ");
+            int edad = leerEntero("Edad: ");
+            club.crearInvitado(idInvitado, nombre, apellido, edad);
+            contadorUsuarios++;
+            nuevo = true;
+        }
+        try {
+            club.inscribirInvitadoTorneoIndividual(usuarioAutenticado.getIdUsuario(), idInvitado, idTorneo);
+            guardarTodo();
+            System.out.println("Invitado inscrito con un cupo general (ID del invitado: " + idInvitado + ").");
+            if (club.getTorneos().get(idTorneo).isCompetitivo()) {
+                System.out.println("Se registró el cobro de la tarifa (el pago lo gestiona un tercero).");
+            }
+        } catch (IllegalArgumentException e) {
+            if (nuevo) {
+                club.getUsuarios().remove(idInvitado);
+                contadorUsuarios--;
+            }
+            System.out.println("No se pudo inscribir al invitado: " + e.getMessage());
+        }
+    }
+
+    private void retirarInvitadoDeTorneo() {
+        System.out.println("\n--- RETIRAR A UN INVITADO DE UN TORNEO ---");
+        System.out.println("Torneos individuales en curso:");
+        if (!imprimirTorneosIndividualesEnCurso()) {
+            System.out.println("No hay torneos individuales en curso.");
+            return;
+        }
+        String idTorneo = leerTexto("ID del torneo: ");
+        String idInvitado = leerTexto("ID del invitado: ");
+        try {
+            club.desinscribirParticipanteTorneoIndividual(idInvitado, idTorneo);
+            guardarTodo();
+            System.out.println("Se eliminó la inscripción y se liberó el cupo.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("No se pudo retirar al invitado: " + e.getMessage());
         }
     }
     

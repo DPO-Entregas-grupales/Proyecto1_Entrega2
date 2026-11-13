@@ -15,6 +15,7 @@ import Usuarios.Socio;
 import Usuarios.Usuario;
 import Usuarios.Administrador;
 import Usuarios.Empleado;
+import Usuarios.Invitado;
 
 public class PersistenciaUsuariosJson {
 
@@ -65,6 +66,8 @@ public class PersistenciaUsuariosJson {
                 club.crearFisioterapeuta(id, nombre, apellido, login, contrasena, puntos, codigo);
             } else if ("Administrador".equalsIgnoreCase(tipo)) {
                 club.crearAdministrador(id, nombre, apellido, login, contrasena, puntos);
+            } else if ("Invitado".equalsIgnoreCase(tipo)) {
+                club.crearInvitado(id, nombre, apellido, jUsuario.getInt(EDAD));
             }
         }
     }
@@ -103,6 +106,9 @@ public class PersistenciaUsuariosJson {
                     jUsuario.put(CODIGO_DESCUENTO, ((Empleado) usuario).getCodigoDescuento());
                 } else if (usuario instanceof Administrador) {
                     jUsuario.put(TIPO_USUARIO, "Administrador");
+                } else if (usuario instanceof Invitado) {
+                    jUsuario.put(TIPO_USUARIO, "Invitado");
+                    jUsuario.put(EDAD, ((Invitado) usuario).getEdad());
                 }
 
                 jUsuarios.put(jUsuario);
