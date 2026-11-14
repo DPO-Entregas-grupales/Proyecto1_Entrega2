@@ -6,8 +6,8 @@ import Partidos.PartidoCompetencia;
 public class Competencia {
 	private String nombreCompetencia;
 	private String entidadOrganizadora;
-	static String ASCUN = "Ascun";
-	static String CERROS = "Cerros";
+	public static String ASCUN = "Ascun";
+	public static String CERROS = "Cerros";
 	private String anioTemporada;
 	private String formato;
 	private String faseActual;

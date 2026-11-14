@@ -227,7 +227,15 @@ public class PersistenciaClubDeportivoJson {
             int cantidadJugadores = jObj.getInt("cantidadJugadores");
             String modalidad = jObj.getString("modalidad");
 
-            club.crearReserva(idReserva, idSocio, nombreInstalacion, fecha, horaInicio, cantidadJugadores, modalidad);
+            Usuario usuario = club.getUsuarios().get(idSocio);
+            Instalacion inst = club.getInstalaciones().get(nombreInstalacion);
+            if (usuario instanceof Usuarios.Socio && inst != null) {
+                Usuarios.Socio socio = (Usuarios.Socio) usuario;
+                Reserva reserva = new Reserva(idReserva, socio, inst, fecha, horaInicio, cantidadJugadores, modalidad);
+                inst.utilizarHorario(fecha, horaInicio);
+                club.agregarReserva(reserva);
+                socio.agregarReserva(reserva);
+            }
         }
     }
 
